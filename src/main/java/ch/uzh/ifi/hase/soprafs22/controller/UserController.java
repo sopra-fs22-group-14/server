@@ -42,7 +42,7 @@ public class UserController {
     return userGetDTOs;
   }
 
-  @PostMapping("/users")
+  @PostMapping("/users/register")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
@@ -55,4 +55,24 @@ public class UserController {
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
+  @PostMapping("/users/login")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO login(@RequestBody UserPostDTO userPostDTO) {
+        return userService.login(userPostDTO);
+    }
+    @GetMapping("users/logout/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void logout(@PathVariable String token) {
+        userService.logout(token);
+    }
+
+
+
+
+
+
+
+
 }

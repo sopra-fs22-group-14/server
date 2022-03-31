@@ -3,6 +3,9 @@ package ch.uzh.ifi.hase.soprafs22.service;
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,7 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setStatus(UserStatus.ONLINE);
 
     checkIfUserExists(newUser);
 
@@ -78,4 +81,34 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
     }
   }
+
+  public UserGetDTO login(UserPostDTO userPostDTO){
+        String username=userPostDTO.getUsername();
+        String password=userPostDTO.getPassword();
+      if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
+      }
+
+        User userByName=userRepository.findByUsername(username);
+      if (userByName == null) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given username was not found.");
+      }
+      if (!userByName.getPassword().equals(password)) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password.");
+      }
+      userByName.setStatus(UserStatus.ONLINE);
+      userRepository.saveAndFlush(userByName);
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByName);
+
+  }
+
+
+    public void logout(String token) {
+        User userByToken=userRepository.findByToken(token);
+        if (userByToken == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given token was not found.");
+        }
+        userByToken.setStatus(UserStatus.OFFLINE);
+        userRepository.saveAndFlush(userByToken);
+    }
 }

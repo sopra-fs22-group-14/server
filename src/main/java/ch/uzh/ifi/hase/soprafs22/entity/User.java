@@ -1,9 +1,16 @@
 package ch.uzh.ifi.hase.soprafs22.entity;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Internal User Representation
@@ -15,6 +22,10 @@ import java.io.Serializable;
  * - unique = true -> this value must be unqiue across the database -> composes
  * the primary key
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "USER")
 public class User implements Serializable {
@@ -25,7 +36,7 @@ public class User implements Serializable {
   @GeneratedValue
   private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String name;
 
   @Column(nullable = false, unique = true)
@@ -37,43 +48,24 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
-  public Long getId() {
-    return id;
-  }
+  @Column(nullable = false,unique = true)
+    private String password;
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+  @Column
+    private int totalGamePlayed;
 
-  public String getName() {
-    return name;
-  }
+  @Column
+    private int totalGameWon;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+  @Column
+    private int totalRoundPlayed;
 
-  public String getUsername() {
-    return username;
-  }
+  @Column
+    private int totalRoundWon;
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+  @ElementCollection
+    private List<String> bestCombinations=new ArrayList<String>();
 
-  public String getToken() {
-    return token;
-  }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
 
-  public UserStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
 }
