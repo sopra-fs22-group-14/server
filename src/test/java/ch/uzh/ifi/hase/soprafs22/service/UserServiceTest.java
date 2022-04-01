@@ -30,7 +30,6 @@ public class UserServiceTest {
     // given
     testUser = new User();
     testUser.setUserId(1L);
-    testUser.setUsername("testName");
     testUser.setUsername("testUsername");
 
     // when -> any object is being save in the userRepository -> return the dummy
@@ -48,7 +47,6 @@ public class UserServiceTest {
     Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
 
     assertEquals(testUser.getUserId(), createdUser.getUserId());
-    assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
     assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
