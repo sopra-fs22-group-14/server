@@ -38,6 +38,7 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
+  //getAllUsersFromRepo
   public List<User> getUsers() {
     return this.userRepository.findAll();
   }
@@ -50,8 +51,8 @@ public class UserService {
 
     // saves the given entity but data is only persisted in the database once
     // flush() is called
-    newUser = userRepository.save(newUser);
-    userRepository.flush();
+    newUser = userRepository.save(newUser); //saving in memory
+    userRepository.flush(); //persist in Db
 
     log.debug("Created Information for User: {}", newUser);
     return newUser;
@@ -69,17 +70,11 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByName = userRepository.findByName(userToBeCreated.getName());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the name", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
-    }
+      String baseErrorMessage = "The username provided is not unique. Therefore, the user could not be created!";
+      if (userByUsername != null) {
+          throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage));
+      }
   }
 
   public UserGetDTO login(UserPostDTO userPostDTO){
@@ -89,16 +84,16 @@ public class UserService {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
       }
 
-        User userByName=userRepository.findByUsername(username);
-      if (userByName == null) {
+        User userByUsername=userRepository.findByUsername(username);
+      if (userByUsername == null) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given username was not found.");
       }
-      if (!userByName.getPassword().equals(password)) {
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password.");
+      if (!userByUsername.getPassword().equals(password)) {
+          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have entered an invalid password");
       }
-      userByName.setStatus(UserStatus.ONLINE);
-      userRepository.saveAndFlush(userByName);
-      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByName);
+      userByUsername.setStatus(UserStatus.ONLINE);
+      userRepository.saveAndFlush(userByUsername);
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByUsername);
 
   }
 
@@ -111,4 +106,19 @@ public class UserService {
         userByToken.setStatus(UserStatus.OFFLINE);
         userRepository.saveAndFlush(userByToken);
     }
+
+    //needed for later
+    public User getUserById(Long id){
+        List<User> userList = getUsers();
+        for (User user : userList) { //foreach to look through the UserList for the correct user
+            if(user.getUserId().equals(id)){
+                return user;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Non existing id. User was not found");
+    }
+    
+    //public void makeUserOnline(User loggedInUser){loggedInUser.setStatus(true);}
+
+    //public void makeUserOffline(User loggedOutUser){loggedOutUser.setStatus(false);}
 }

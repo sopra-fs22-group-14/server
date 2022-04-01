@@ -16,7 +16,9 @@ import java.util.List;
 @Service
 @Transactional
 public class GameService {
+
     private Logger log = LoggerFactory.getLogger(GameService.class);
+
     private GameRepository gameRepository;
 
     public GameService(@Qualifier("gameRepository")GameRepository gameRepository) {

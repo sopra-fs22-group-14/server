@@ -10,9 +10,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserPostDTO {
 
+  private String username;
+
   private String password;
 
-  private String username;
+
 
 
 }

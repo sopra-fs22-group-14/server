@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,34 +14,36 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "GAME")
-
-public class Game implements Serializable{
+@Table(name = "PLAYER")
+public class Player {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
-    private Long gameId;
+    private Long playerId;
 
     @Column(nullable = false, unique = true)
-    private String gameName;
+    private String playerName;
 
     @Column(nullable = false)
-    private boolean cardCzarMode;
+    private boolean isCardCzar;
 
     @Column(nullable = false)
-    private String gameEdition;
+    private boolean isPlaying;
 
-    @Column
-    private int numOfPlayersJoined;
-
-    //@Column(nullable = false, unique=true)
-    //@ElementCollection
-    //private List<Player> playerList = new ArrayList<>;
+    @Column(nullable = false)
+    private int RoundsWon;
 
     //@Column(nullable = false)
     //@ElementCollection
-    //private List<GameRound> rounds = new ArrayList<>;
+    //private List<Cards> cardsOnHands = new ArrayList<Cards>;
+
+    //@Column(nullable = false)
+    //@ElementCollection
+    //private List<String> CombinationsOfGame=new ArrayList<String>();
+
+
+
 
 }

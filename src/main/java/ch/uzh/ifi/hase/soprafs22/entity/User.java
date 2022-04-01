@@ -34,10 +34,7 @@ public class User implements Serializable {
 
   @Id
   @GeneratedValue
-  private Long id;
-
-  @Column(nullable = true)
-  private String name;
+  private Long userId;
 
   @Column(nullable = false, unique = true)
   private String username;
@@ -46,26 +43,24 @@ public class User implements Serializable {
   private String token;
 
   @Column(nullable = false)
-  private UserStatus status;
+  private UserStatus status; //logged_in --> ENUMS yes/no to be decided
 
-  @Column(nullable = false,unique = true)
+  @Column(nullable = false)
     private String password;
 
-  @Column
+  @Column(nullable = false)
     private int totalGamePlayed;
 
-  @Column
+  @Column(nullable = false)
     private int totalGameWon;
 
-  @Column
+  @Column(nullable = false)
     private int totalRoundPlayed;
 
-  @Column
+  @Column(nullable = false)
     private int totalRoundWon;
 
+  @Column(nullable = false)
   @ElementCollection
-    private List<String> bestCombinations=new ArrayList<String>();
-
-
-
+    private List<String> bestCombinations=new ArrayList<>();
 }
