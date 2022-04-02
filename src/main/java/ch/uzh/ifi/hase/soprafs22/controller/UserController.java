@@ -62,6 +62,8 @@ public class UserController {
   public UserGetDTO login(@RequestBody UserPostDTO userPostDTO) {
         return userService.login(userPostDTO);
     }
+
+
     @GetMapping("users/logout/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody

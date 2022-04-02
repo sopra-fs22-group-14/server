@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +30,7 @@ public class GameRound {
 
     //@Column(nullable = false)
     //@ElementCollection
-    //private List<Cards> playedCards = new ArrayList<>;
+    //private List<Long> playedCardsId = new ArrayList<>();
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection

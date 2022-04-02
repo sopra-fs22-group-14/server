@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,6 +52,11 @@ public class User implements Serializable {
 
   @Column(nullable = false)
     private int totalGamePlayed;
+
+  @CreationTimestamp
+  @Temporal(TemporalType.DATE)
+  @Column(nullable = false)
+  private Date creationDate;
 
   @Column(nullable = false)
     private int totalGameWon;
