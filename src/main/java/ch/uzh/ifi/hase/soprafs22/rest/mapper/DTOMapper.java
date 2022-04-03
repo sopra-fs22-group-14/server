@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -20,14 +21,24 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface DTOMapper {
 
-  DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
+    DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
+
+    User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
+    // --- build gradle gives warning unmapped properties |!|
+
+    @Mapping(source = "userId", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "status", target = "status")
+    UserGetDTO convertEntityToUserGetDTO(User user);
+    // --- build gradle gives warning unmapped properties |!|
 
 
 
-  User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
-  @Mapping(source = "userId", target = "id")
-  @Mapping(source = "username", target = "username")
-  @Mapping(source = "status", target = "status")
-  UserGetDTO convertEntityToUserGetDTO(User user);
+    // Need when user logs in - while registering + while logging in
+    /** PRODUCTION READY*/
+    /** SZYMON */
+    @Mapping(source = "userId", target = "id")
+    @Mapping(source = "token", target = "token")
+    UserLoginDTO convertEntityToUserLoginDTO(User user);
 }

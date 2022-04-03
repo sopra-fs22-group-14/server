@@ -30,74 +30,82 @@ import java.util.UUID;
 @Transactional
 public class UserService {
 
-  private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  @Autowired
-  public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+    @Autowired
+    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-  //getAllUsersFromRepo
-  public List<User> getUsers() {
+    //getAllUsersFromRepo
+    public List<User> getUsers() {
     return this.userRepository.findAll();
-  }
+    }
 
-  public User createUser(User newUser) {
-    newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.ONLINE);
-    newUser.setCreationDate(new Date());
 
-    checkIfUserExists(newUser);
+    /** PRODUCTION READY*/
+    /** SZYMON */
+    public User createUser(User newUser) {
+        String newToken = generateUniqueToken();
+        newUser.setToken(newToken);
+        newUser.setStatus(UserStatus.ONLINE);
+        newUser.setCreationDate(new Date());
 
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    newUser = userRepository.save(newUser); //saving in memory
-    userRepository.flush(); //persist in Db
+        checkIfUserExists(newUser);
 
-    log.debug("Created Information for User: {}", newUser);
-    return newUser;
-  }
+        // saves the given entity but data is only persisted in the database once
+        // flush() is called
+        newUser = userRepository.save(newUser); //saving in memory
+        userRepository.flush(); //persist in Db
 
-  /**
-   * This is a helper method that will check the uniqueness criteria of the
-   * username and the name
-   * defined in the User entity. The method will do nothing if the input is unique
-   * and throw an error otherwise.
-   *
-   * @param userToBeCreated
-   * @throws org.springframework.web.server.ResponseStatusException
-   * @see User
-   */
-  private void checkIfUserExists(User userToBeCreated) {
+        log.debug("Created Information for User: {}", newUser);
+        return newUser;
+    }
+
+    // Helper needed for the login / registration to check if the assigned token is unique
+    /** PRODUCTION READY*/
+    /** SZYMON */
+    public String generateUniqueToken(){
+        String newToken = UUID.randomUUID().toString();
+        User userByToken = userRepository.findByToken(newToken);
+        while(userByToken != null){
+            // meaning there is already user with this token
+            newToken = UUID.randomUUID().toString();
+        }
+        return newToken;
+    }
+
+
+
+    private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-
-      String baseErrorMessage = "The username provided is not unique. Therefore, the user could not be created!";
-      if (userByUsername != null) {
+        String baseErrorMessage = "The username provided is not unique. Therefore, the user could not be created!";
+        if (userByUsername != null) {
           throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage));
-      }
-  }
+        }
+    }
 
-  public UserGetDTO login(UserPostDTO userPostDTO){
+    public UserGetDTO login(UserPostDTO userPostDTO){
         String username=userPostDTO.getUsername();
         String password=userPostDTO.getPassword();
-      if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
+        if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
-      }
+        }
 
         User userByUsername=userRepository.findByUsername(username);
-      if (userByUsername == null) {
+        if (userByUsername == null) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given username was not found.");
-      }
-      if (!userByUsername.getPassword().equals(password)) {
+        }
+        if (!userByUsername.getPassword().equals(password)) {
           throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have entered an invalid password");
-      }
-      userByUsername.setStatus(UserStatus.ONLINE);
-      userRepository.saveAndFlush(userByUsername);
-      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByUsername);
+        }
+        userByUsername.setStatus(UserStatus.ONLINE);
+        userRepository.saveAndFlush(userByUsername);
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByUsername);
 
-  }
+    }
 
 
     public void logout(String token) {
@@ -109,7 +117,7 @@ public class UserService {
         userRepository.saveAndFlush(userByToken);
     }
 
-    //needed for later
+    //needed for later --- why just not findUserById from repository?
     public User getUserById(Long id){
         List<User> userList = getUsers();
         for (User user : userList) { //foreach to look through the UserList for the correct user
@@ -119,7 +127,7 @@ public class UserService {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Non existing id. User was not found");
     }
-    
+
     //public void makeUserOnline(User loggedInUser){loggedInUser.setStatus(true);}
 
     //public void makeUserOffline(User loggedOutUser){loggedOutUser.setStatus(false);}
