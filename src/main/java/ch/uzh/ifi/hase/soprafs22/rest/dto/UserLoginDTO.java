@@ -8,9 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPostDTO {
-
-  private String username;
-  private String password;
-
+public class UserLoginDTO {
+    private Long id;
+    private String token;
 }

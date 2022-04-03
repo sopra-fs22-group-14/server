@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
@@ -21,61 +22,62 @@ import java.util.List;
 @RestController
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  UserController(UserService userService) {
+    UserController(UserService userService) {
     this.userService = userService;
-  }
+    }
 
-  @GetMapping("/users")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<UserGetDTO> getAllUsers() {
+    @GetMapping("/users")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<UserGetDTO> getAllUsers() {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
     List<UserGetDTO> userGetDTOs = new ArrayList<>();
 
     // convert each user to the API representation
     for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+        userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
     }
-    return userGetDTOs;
-  }
+        return userGetDTOs;
+    }
 
-  @PostMapping("/users/register")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO) {
-    // convert API user to internal representation
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-    // create user
-    User createdUser = userService.createUser(userInput);
+/** PROFILE OPERATIONS ----------------------------------------------------------------------------------------------*/
+    @PostMapping("/users/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    /** PRODUCTION READY*/
+    /** SZYMON */
+    public UserLoginDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-    // convert internal representation of user back to API
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
-  }
+        // create user
+        User createdUser = userService.createUser(userInput);
 
-  @PostMapping("/users/login")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public UserGetDTO login(@RequestBody UserPostDTO userPostDTO) {
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(createdUser); //LoginDTO
+    }
+
+    @PostMapping("/users/login")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO login(@RequestBody UserPostDTO userPostDTO) {
         return userService.login(userPostDTO);
-    }
 
+        // return convertEntityToUserLoginDTO - LoginDTO - same as in registration
+    }
 
     @GetMapping("users/logout/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void logout(@PathVariable String token) {
+        // return same things as in registration
+        // ! logout token sent via header
+        // ! set token to empty string on logout
         userService.logout(token);
     }
-
-
-
-
-
-
-
 
 }

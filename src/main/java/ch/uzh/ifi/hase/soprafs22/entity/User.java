@@ -32,42 +32,42 @@ import java.util.List;
 @Table(name = "USER")
 public class User implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
-  private Long userId;
+    @Id
+    @GeneratedValue
+    private Long userId;
 
-  @Column(nullable = false, unique = true)
-  private String username;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-  @Column(nullable = false, unique = true)
-  private String token;
+    @Column(nullable = false, unique = true)
+    private String token;
 
-  @Column(nullable = false)
-  private UserStatus status; //logged_in --> ENUMS yes/no to be decided
+    @Column(nullable = false)
+    private UserStatus status; //logged_in --> ENUMS yes/no to be decided
 
-  @Column(nullable = false)
+    @Column(nullable = false)
     private String password;
 
-  @Column(nullable = false)
+    @Column(nullable = false)
     private int totalGamePlayed;
 
-  @CreationTimestamp
-  @Temporal(TemporalType.DATE)
-  @Column(nullable = false)
-  private Date creationDate;
+    @CreationTimestamp
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    private Date creationDate;
 
-  @Column(nullable = false)
+    @Column(nullable = false)
     private int totalGameWon;
 
-  @Column(nullable = false)
+    @Column(nullable = false)
     private int totalRoundPlayed;
 
-  @Column(nullable = false)
+    @Column(nullable = false)
     private int totalRoundWon;
 
-  @Column(nullable = false)
-  @ElementCollection
+    @Column(nullable = false)
+    @ElementCollection
     private List<String> bestCombinations=new ArrayList<>();
 }
