@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,9 +38,19 @@ public class Game implements Serializable{
     @Column
     private int numOfPlayersJoined;
 
+    //TODO we might need a gamestatus
+
+
     //@Column(nullable = false, unique=true)
     //@ElementCollection
     //private List<Player> playerList = new ArrayList<>;
+    @Column()
+    @ElementCollection
+    private List<Long> playerIds = new ArrayList<>();
+
+    //TODO this also works decide which one to use
+    //@OneToMany
+    //private List<Player> playerList = new ArrayList<>();
 
     //@Column(nullable = false)
     //@ElementCollection
