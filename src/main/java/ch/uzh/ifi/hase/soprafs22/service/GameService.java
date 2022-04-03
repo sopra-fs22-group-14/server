@@ -33,7 +33,7 @@ public class GameService {
     //TODO I am not sure that we need autowired here. But probably we need since we have multiple repos
 
     @Autowired
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, PlayerRepository playerRepository, UserRepository userRepository) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("playerRepository")PlayerRepository playerRepository,@Qualifier("userRepository") UserRepository userRepository) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;

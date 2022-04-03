@@ -87,9 +87,9 @@ public class UserService {
         }
     }
 
-    public UserGetDTO login(UserPostDTO userPostDTO){
-        String username=userPostDTO.getUsername();
-        String password=userPostDTO.getPassword();
+    public User login(User userInput){
+        String username=userInput.getUsername();
+        String password=userInput.getPassword();
         if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
         }
@@ -102,8 +102,10 @@ public class UserService {
           throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have entered an invalid password");
         }
         userByUsername.setStatus(UserStatus.ONLINE);
+        String newToken = generateUniqueToken();
+        userByUsername.setToken(newToken);
         userRepository.saveAndFlush(userByUsername);
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userByUsername);
+        return userByUsername;
 
     }
 
