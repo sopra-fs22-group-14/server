@@ -36,6 +36,7 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private int RoundsWon;
 
+    //TODO just store Id's or the object's
     //@Column(nullable = false)
     //@ElementCollection
     //private List<Cards> cardsOnHands = new ArrayList<Cards>;

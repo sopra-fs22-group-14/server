@@ -24,6 +24,7 @@ public class Deck {
     @Column(nullable = false)
     private String deckName;
 
+    //TODO just store Id's or the object's
     //@Column(nullable = false)
     //@ElementCollection
     //private List<Card> deck = new ArrayList<>;
