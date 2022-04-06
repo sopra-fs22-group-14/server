@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs22.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
@@ -41,4 +43,13 @@ public interface DTOMapper {
     @Mapping(source = "userId", target = "id")
     @Mapping(source = "token", target = "token")
     UserLoginDTO convertEntityToUserLoginDTO(User user);
+
+
+    // FOR GETTING THE GAME - LOBBY
+    @Mapping(source = "gameId", target = "id")
+    @Mapping(source = "gameName", target = "name")
+    @Mapping(source = "cardCzarMode", target = "gameMode")
+    @Mapping(source = "gameEdition", target = "cardsType")
+    @Mapping(source = "numOfPlayersJoined", target = "numberOfPlayers")
+    GameGetDTO convertEntityToGameGetDTO(Game game);
 }
