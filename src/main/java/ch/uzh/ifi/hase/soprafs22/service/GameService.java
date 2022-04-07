@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
+import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
@@ -55,6 +56,7 @@ public class GameService {
         game.setGameEdition(gameInput.getGameEdition());
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(userId);
+
         addPlayerToGame(adminPlayer,game);
 
 
@@ -77,6 +79,17 @@ public class GameService {
         else{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
+    // function for joining a game
+    public Game joinGame(Long gameId, Long userId){
+        Game game = gameRepository.findByGameId(gameId);
+        if (userRepository.findByUserId(userId).getStatus() == UserStatus.ONLINE){
+            if (!game.getPlayerIds().contains(userId)) {
+                Player player = createPlayer(userId);
+                addPlayerToGame(player, game);
+                return game;
+            } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
+        } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
+    }
 
 
     //TODO we might add gameId to player entity and this function as well
@@ -93,6 +106,7 @@ public class GameService {
         playerRepository.flush();
         return player;
     }
+
 
 
 }
