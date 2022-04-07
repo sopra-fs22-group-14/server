@@ -2,10 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -46,10 +43,15 @@ public interface DTOMapper {
 
 
     // FOR GETTING THE GAME - LOBBY
-    @Mapping(source = "gameId", target = "id")
-    @Mapping(source = "gameName", target = "name")
-    @Mapping(source = "cardCzarMode", target = "gameMode")
-    @Mapping(source = "gameEdition", target = "cardsType")
-    @Mapping(source = "numOfPlayersJoined", target = "numberOfPlayers")
+    @Mapping(source = "gameId", target = "gameId")
+    @Mapping(source = "gameName", target = "gameName")
+    @Mapping(source = "cardCzarMode", target = "cardCzarMode")
+    @Mapping(source = "gameEdition", target = "gameEdition")
+    @Mapping(source = "numOfPlayersJoined", target = "numOfPlayersJoined")
     GameGetDTO convertEntityToGameGetDTO(Game game);
+
+
+    @Mapping(source = "cardCzarMode", target = "cardCzarMode")
+    @Mapping(source = "gameEdition", target = "gameEdition")
+    Game convertGamePostDTOToEntity(GamePostDTO gamePostDTO);
 }

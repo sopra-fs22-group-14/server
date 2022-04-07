@@ -1,5 +1,4 @@
 package ch.uzh.ifi.hase.soprafs22.rest.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,13 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
-
-
-public class GameGetDTO {
-    private Long gameId;
-    private String gameName;
-    private boolean cardCzarMode;
+public class GamePostDTO {
     private String gameEdition;
-    private int numOfPlayersJoined;
+    private boolean cardCzarMode;
 
 }
