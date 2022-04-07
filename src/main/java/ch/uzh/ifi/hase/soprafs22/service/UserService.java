@@ -116,7 +116,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given token was not found.");
         }
         userByToken.setStatus(UserStatus.OFFLINE);
-        userByToken.setToken("");
+        //userByToken.setToken("");
         userRepository.saveAndFlush(userByToken);
         return userByToken;
     }
