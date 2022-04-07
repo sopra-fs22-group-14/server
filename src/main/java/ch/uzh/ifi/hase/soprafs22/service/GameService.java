@@ -49,6 +49,7 @@ public class GameService {
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
+
         Game game = new Game();
         game.setGameName(gameInput.getGameName());
         game.setCardCzarMode(gameInput.isCardCzarMode());
@@ -59,15 +60,14 @@ public class GameService {
 
         addPlayerToGame(adminPlayer,game);
 
-
         game = gameRepository.save(game);
         gameRepository.flush();
         //TODO maybe we can add the game id to the players and remove them from the lobby
 
-
         return game;
     }
 
+        //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
 
         if (game.getNumOfPlayersJoined() < 5){

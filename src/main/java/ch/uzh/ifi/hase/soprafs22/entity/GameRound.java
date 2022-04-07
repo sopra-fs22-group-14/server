@@ -24,6 +24,7 @@ public class GameRound {
     @Column(nullable = false)
     private int roundNumber;
 
+    //TODO just store Id's or the object's
     //@OneToOne //correct to solve "'Basic' attribute type should not be 'Persistence Entity'"?
     //@Column(nullable = false)
     //private Card blackCard;
