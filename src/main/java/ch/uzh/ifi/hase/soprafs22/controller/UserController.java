@@ -74,11 +74,13 @@ public class UserController {
     @PostMapping("users/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void logout(@RequestHeader(name="token") String token) {
+    public UserLoginDTO logout(@RequestHeader("Authorization") String token) {
         // return same things as in registration
         // ! logout token sent via header
         // ! set token to empty string on logout
-        userService.logout(token);
+        System.out.println("TOKEN: "+token);
+        User userByToken=userService.logout(token);
+        return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(userByToken);
     }
 
 }
