@@ -39,6 +39,17 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+
+
+    /** INITIAL SKETCH FOR CHECKING AUTHORIZATION */
+    public void checkIfAuthorized(String token){
+        User userByToken=userRepository.findByToken(token);
+        if (userByToken == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not Authorized!");
+        }
+    }
+
+
     //getAllUsersFromRepo
     public List<User> getUsers() {
     return this.userRepository.findAll();
