@@ -12,5 +12,5 @@ import lombok.Setter;
 public class GamePostDTO {
     private String gameEdition;
     private boolean cardCzarMode;
-
+    private String gameName;
 }

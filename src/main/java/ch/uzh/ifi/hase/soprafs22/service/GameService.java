@@ -45,7 +45,7 @@ public class GameService {
         return this.gameRepository.findAll();
     }
 
-    public Game createNewGame(Game gameInput,Long userId) {
+    public Game createNewGame(Game gameInput,String token) {
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
@@ -56,12 +56,12 @@ public class GameService {
         game.setNumOfPlayersJoined(1);
         game.setGameEdition(gameInput.getGameEdition());
         // admin player is the one who creates game
-        Player adminPlayer = createPlayer(userId);
+        Player adminPlayer = createPlayer(token);
 
         addPlayerToGame(adminPlayer,game);
 
-        game = gameRepository.save(game);
-        gameRepository.flush();
+        game = gameRepository.saveAndFlush(game);
+
         //TODO maybe we can add the game id to the players and remove them from the lobby
 
         return game;
@@ -80,7 +80,7 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
     // function for joining a game
-    public Game joinGame(Long gameId, Long userId){
+   /* public Game joinGame(Long gameId, Long userId){
         Game game = gameRepository.findByGameId(gameId);
         if (userRepository.findByUserId(userId).getStatus() == UserStatus.ONLINE){
             if (!game.getPlayerIds().contains(userId)) {
@@ -89,21 +89,20 @@ public class GameService {
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
-    }
+    } */
 
 
     //TODO we might add gameId to player entity and this function as well
 
-    private Player createPlayer(Long userId){
-        User user = userRepository.findByUserId(userId);
+    private Player createPlayer(String token){
+        User user = userRepository.findByToken(token);
         Player player = new Player();
         player.setPlayerId(user.getUserId());
         player.setPlayerName(user.getUsername());
-        player.setPlaying(false);
+        player.setPlaying(true);
         player.setCardCzar(false);
         player.setRoundsWon(0);
-        player = playerRepository.save(player);
-        playerRepository.flush();
+        player = playerRepository.saveAndFlush(player);
         return player;
     }
 

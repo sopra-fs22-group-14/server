@@ -21,7 +21,6 @@ public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
     private Long playerId;
 
     @Column(nullable = false, unique = true)

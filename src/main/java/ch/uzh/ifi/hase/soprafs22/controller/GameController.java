@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs22.controller;
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,20 @@ public class GameController {
         // return DTOs
         return gameGetDTOs;
     }
+
+    @PostMapping("/games")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public GameGetDTO createNewGame(@RequestHeader("Authorization") String token,@RequestBody GamePostDTO gamePostDTO){
+        Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
+        Game newGame = gameService.createNewGame(gameInput,token);
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(newGame);
+
+    }
+
+
+
+
 
 
 }
