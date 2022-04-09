@@ -9,9 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class GamePostDTO {
-    private String gameEdition;
-    private boolean cardCzarMode;
-    private String gameName;
-    private int numOfRounds;
+public class GamePutDTO {
+    private long gameId;
 }

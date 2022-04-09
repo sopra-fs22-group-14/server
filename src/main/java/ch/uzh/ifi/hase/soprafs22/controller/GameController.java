@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePutDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
@@ -63,6 +64,18 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(newGame);
 
     }
+
+    @PutMapping("/games")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO joinGame(@RequestHeader("Authorization") String token,@RequestBody GamePutDTO gamePutDTO){
+
+        Game joinedGame = gameService.joinGame(gamePutDTO.getGameId(),token);
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(joinedGame);
+
+    }
+    
+
 
 
 

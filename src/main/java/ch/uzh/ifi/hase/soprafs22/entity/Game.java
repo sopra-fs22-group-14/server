@@ -38,6 +38,9 @@ public class Game implements Serializable{
     @Column
     private int numOfPlayersJoined;
 
+    @Column
+    private int numOfRounds;
+
     //TODO we might need a gamestatus
 
     //TODO just store Id's or the object's

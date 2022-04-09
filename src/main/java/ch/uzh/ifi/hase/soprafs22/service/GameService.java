@@ -54,6 +54,7 @@ public class GameService {
         game.setGameName(gameInput.getGameName());
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
+        game.setNumOfRounds(gameInput.getNumOfRounds());
         game.setGameEdition(gameInput.getGameEdition());
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(token);
@@ -70,7 +71,7 @@ public class GameService {
         //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
 
-        if (game.getNumOfPlayersJoined() < 5){
+        if (game.getNumOfPlayersJoined() < 4){
             List<Long> players = game.getPlayerIds();
             players.add(playerToAdd.getPlayerId());
             game.setPlayerIds(players);
@@ -80,16 +81,17 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
     // function for joining a game
-   /* public Game joinGame(Long gameId, Long userId){
+   public Game joinGame(Long gameId, String token){
         Game game = gameRepository.findByGameId(gameId);
-        if (userRepository.findByUserId(userId).getStatus() == UserStatus.ONLINE){
-            if (!game.getPlayerIds().contains(userId)) {
-                Player player = createPlayer(userId);
+        User userToJoin=userRepository.findByToken(token);
+        if (userToJoin.getStatus() == UserStatus.ONLINE){
+            if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
+                Player player = createPlayer(token);
                 addPlayerToGame(player, game);
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
-    } */
+    }
 
 
     //TODO we might add gameId to player entity and this function as well
