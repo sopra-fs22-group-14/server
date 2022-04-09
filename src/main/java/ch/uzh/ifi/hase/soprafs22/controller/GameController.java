@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
+import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ch.uzh.ifi.hase.soprafs22.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +18,19 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
+    private final UserService userService;
 
-    GameController(GameService gameService) {
+    GameController(GameService gameService, UserService userService) {
         this.gameService = gameService;
+        this.userService = userService;
     }
 
     @GetMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<GameGetDTO> getAllGames() {
-        // GET TOKEN FROM HEADER CHECK IF AUTHORIZED etc...
+    public List<GameGetDTO> getAllGames(@RequestHeader("Authorization") String token) {
+        // GET TOKEN FROM HEADER CHECK IF AUTHORIZED etc..
+        userService.checkIfAuthorized(token);
         Game gameA = new Game();
         gameA.setGameId(1L);
         gameA.setGameName("game1");
