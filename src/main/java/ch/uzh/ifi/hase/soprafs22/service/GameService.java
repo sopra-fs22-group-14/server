@@ -104,7 +104,7 @@ public class GameService {
 
     // function for joining a game
     public Game joinGame(Long gameId, String token){
-        Game game = gameRepository.findByGameId(gameId);
+        Game game = this.getGame(gameId);
         User userToJoin = userRepository.findByToken(token);
         if (userToJoin.getStatus() == UserStatus.ONLINE){
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
@@ -128,7 +128,7 @@ public class GameService {
 
     // method if a player decides to leave the waitingArea
     public void leaveWaitingArea(Long gameId, String token) {
-        Game gameToLeave = gameRepository.findByGameId(gameId);
+        Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
