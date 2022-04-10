@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
