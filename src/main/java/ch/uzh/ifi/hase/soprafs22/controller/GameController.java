@@ -2,10 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.GameGetDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePostDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePutDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -30,8 +27,19 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<GameGetDTO> getAllGames(@RequestHeader("Authorization") String token) {
+
         // GET TOKEN FROM HEADER CHECK IF AUTHORIZED etc..
         userService.checkIfAuthorized(token);
+        List<Game> games = gameService.getAllGames();
+        List<GameGetDTO> gameGetDTOs = new ArrayList<>();
+
+        // convert each game to the API representation
+        for (Game game : games)
+            gameGetDTOs.add(DTOMapper.INSTANCE.convertEntityToGameGetDTO(game));
+        // return DTOs
+        return gameGetDTOs;
+
+        /*
         Game gameA = new Game();
         gameA.setGameId(1L);
         gameA.setGameName("game1");
@@ -50,15 +58,14 @@ public class GameController {
         // convert each user to the API representation
         gameGetDTOs.add(DTOMapper.INSTANCE.convertEntityToGameGetDTO(gameA));
         gameGetDTOs.add(DTOMapper.INSTANCE.convertEntityToGameGetDTO(gameB));
-
-        // return DTOs
-        return gameGetDTOs;
+        */
     }
 
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public GameGetDTO createNewGame(@RequestHeader("Authorization") String token,@RequestBody GamePostDTO gamePostDTO){
+        userService.checkIfAuthorized(token);
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         Game newGame = gameService.createNewGame(gameInput,token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(newGame);
@@ -69,17 +76,29 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameGetDTO joinGame(@RequestHeader("Authorization") String token,@RequestBody GamePutDTO gamePutDTO){
-
+        userService.checkIfAuthorized(token);
         Game joinedGame = gameService.joinGame(gamePutDTO.getGameId(),token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(joinedGame);
-
     }
-    
 
+    @GetMapping("/games/waitingArea/{gameId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO updatePlayerCount(@RequestHeader("Authorization") String token,
+                                        @PathVariable Long gameId) {
+        userService.checkIfAuthorized(token);
+        Game requestedGame = gameService.updatePlayerCount(gameId, token);
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
+    }
 
-
-
-
+    @PutMapping("/games/waitingArea/{gameId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void leaveWaitingArea(@RequestHeader("Authorization") String token,
+                                        @PathVariable Long gameId) {
+        userService.checkIfAuthorized(token);
+        gameService.leaveWaitingArea(gameId, token);
+    }
 
 
 }

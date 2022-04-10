@@ -59,4 +59,8 @@ public class Game implements Serializable{
     //@ElementCollection
     //private List<GameRound> rounds = new ArrayList<>;
 
+    public void decreasePlayers() {
+        this.numOfPlayersJoined--;
+    }
+
 }

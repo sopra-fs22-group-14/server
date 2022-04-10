@@ -41,8 +41,16 @@ public class GameService {
     }
 
     public List<Game> getAllGames(){
-
         return this.gameRepository.findAll();
+    }
+
+    // get a single game with a given Id
+    public Game getGame(Long gameId) {
+        Game game = gameRepository.findByGameId(gameId);
+        if (game == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game with given Id doesn't exist!");
+        }
+        return game;
     }
 
     public Game createNewGame(Game gameInput,String token) {
@@ -80,10 +88,24 @@ public class GameService {
         else{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
+
+
+    private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
+        // TODO delete player object for corresponding user?
+        // TODO delete game if there are no users left
+        for (Long playerId : gameToLeave.getPlayerIds()) {
+            if (playerId == userToRemove.getUserId()) {
+                gameToLeave.getPlayerIds().remove(playerId);
+                gameToLeave.decreasePlayers();
+                return;
+            }
+        }
+    }
+
     // function for joining a game
-   public Game joinGame(Long gameId, String token){
+    public Game joinGame(Long gameId, String token){
         Game game = gameRepository.findByGameId(gameId);
-        User userToJoin=userRepository.findByToken(token);
+        User userToJoin = userRepository.findByToken(token);
         if (userToJoin.getStatus() == UserStatus.ONLINE){
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
                 Player player = createPlayer(token);
@@ -91,6 +113,27 @@ public class GameService {
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
+    }
+
+    // method to update player count in the waiting area
+    public Game updatePlayerCount(Long gameId, String token) {
+        Game requestedGame = this.getGame(gameId); //throws error if not found
+        User userWhoRequested = userRepository.findByToken(token);
+        // if the requested user is NOT actually in the requested game, throw error
+        if (!requestedGame.getPlayerIds().contains(userWhoRequested.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not in this game, join first!");
+        }
+        return requestedGame;
+    }
+
+    // method if a player decides to leave the waitingArea
+    public void leaveWaitingArea(Long gameId, String token) {
+        Game gameToLeave = gameRepository.findByGameId(gameId);
+        User userToRemove = userRepository.findByToken(token);
+        // if the user is not in the game, don't do anything (no error required)
+        if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
+            return;
+        removePlayerFromGame(gameToLeave, userToRemove);
     }
 
 
