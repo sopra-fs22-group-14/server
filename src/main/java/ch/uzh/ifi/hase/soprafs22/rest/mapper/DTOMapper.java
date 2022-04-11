@@ -48,6 +48,7 @@ public interface DTOMapper {
     @Mapping(source = "cardCzarMode", target = "cardCzarMode")
     @Mapping(source = "gameEdition", target = "gameEdition")
     @Mapping(source = "numOfPlayersJoined", target = "numOfPlayersJoined")
+    @Mapping(source = "numOfRounds", target = "numOfRounds")
     GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "gameName", target = "gameName")
