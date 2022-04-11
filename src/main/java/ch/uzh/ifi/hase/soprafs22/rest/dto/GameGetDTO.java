@@ -18,5 +18,5 @@ public class GameGetDTO {
     private boolean cardCzarMode;
     private String gameEdition;
     private int numOfPlayersJoined;
-    private int numOfRounds;
+
 }
