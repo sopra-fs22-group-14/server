@@ -76,6 +76,17 @@ public class GameService {
         return game;
     }
 
+    // GAME DELETION
+    public void deleteGame(Long gameId) {
+        Game game = gameRepository.findByGameId(gameId);
+        if (game == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game with given Id doesn't exist!");
+        }
+        gameRepository.delete(game);
+        gameRepository.flush();
+    }
+
+
         //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
 

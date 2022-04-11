@@ -72,6 +72,19 @@ public class GameController {
 
     }
 
+
+
+    // GAME DELETION
+    @DeleteMapping("/games/{gameId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGame(@RequestHeader("Authorization") String token, @PathVariable Long gameId){
+        userService.checkIfAuthorized(token);
+        gameService.deleteGame(gameId); // game is deleted
+    }
+
+
+
+
     @PutMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -80,6 +93,7 @@ public class GameController {
         Game joinedGame = gameService.joinGame(gamePutDTO.getGameId(),token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(joinedGame);
     }
+
 
     @GetMapping("/games/waitingArea/{gameId}")
     @ResponseStatus(HttpStatus.OK)
