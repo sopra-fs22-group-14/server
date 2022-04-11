@@ -74,15 +74,14 @@ public class GameController {
 
 
 
-    // GAME DELETION
-    @DeleteMapping("/games/{gameId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGame(@RequestHeader("Authorization") String token, @PathVariable Long gameId){
-        userService.checkIfAuthorized(token);
-        gameService.deleteGame(gameId); // game is deleted
-    }
-
-
+//    // GAME DELETION
+//    @DeleteMapping("/games/{gameId}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteGame(@RequestHeader("Authorization") String token, @PathVariable Long gameId){
+//        // checking if the user is authorized
+//        userService.checkIfAuthorized(token);
+//        gameService.deleteGameInWaitingArea(gameId, token); // game is deleted
+//    }
 
 
     @PutMapping("/games")
