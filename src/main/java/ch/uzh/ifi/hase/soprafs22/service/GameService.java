@@ -134,9 +134,23 @@ public class GameService {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
+
+                // if the lobby is full, start the game
+                if (game.getNumOfPlayersJoined() == 4)
+                    this.startGame(game);
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
+    }
+
+    // helper method to actually start the game
+    /* TODO: create a new GameRound (add it to the list of GameRounds and set
+        it as the currentRound) and add a black card to this GameRound.
+        Furthermore, create a method to give every player a role as well as
+        10 white cards.
+     */
+    private void startGame(Game game) {
+        return;
     }
 
     // method to update player count in the waiting area
@@ -161,7 +175,7 @@ public class GameService {
         // if contains more than one player then just remove the player
         if (gameToLeave.getNumOfPlayersJoined() > 1) {
             removePlayerFromGame(gameToLeave, userToRemove);
-        }else{
+        } else {
             // if there is only one player left, delete the game
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
