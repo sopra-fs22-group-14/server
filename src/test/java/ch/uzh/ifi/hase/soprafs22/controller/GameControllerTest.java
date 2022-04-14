@@ -33,9 +33,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -82,12 +81,12 @@ public class GameControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].gameId", is(testGame.getGameId().intValue())))
-                .andExpect(jsonPath("$[0].gameName", is(testGame.getGameName())));
-        //.andExpect(jsonPath("$.numberOfPlayersJoined", is(testGame.getNumOfPlayersJoined())));
+                .andExpect(jsonPath("$[0].gameName", is(testGame.getGameName())))
+                .andExpect(jsonPath("$[0].numOfPlayersJoined", is(testGame.getNumOfPlayersJoined())));
 
     }
     @Test
-    void givenGame_whenCreateGame_thenReturn_GameDTO() throws Exception {
+    void givenGame_whenCreateGame_thenReturn_GameGetDTO() throws Exception {
 
         Game testGame=new Game();
         testGame.setGameId(1L);
@@ -113,6 +112,36 @@ public class GameControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))                    // <-- Content-Type accepted?
                 .andExpect(jsonPath("gameId", is(testGame.getGameId().intValue())));
     }
+    @Test
+    void givenGame_whenJoinGame_thenReturn_GameGetDTO() throws Exception{
+
+        Game testGame=new Game();
+        testGame.setGameId(1L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+
+        given(gameService.joinGame(Mockito.any(),Mockito.anyString())).willReturn(testGame);
+
+        GamePutDTO gamePutDTO = new GamePutDTO();
+        gamePutDTO.setGameId(1L);
+
+        MockHttpServletRequestBuilder putRequest = put("/games").contentType(MediaType.APPLICATION_JSON).content(asJsonString(gamePutDTO)). header("Authorization","currenttoken");
+
+        mockMvc.perform(putRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("gameId", is(testGame.getGameId().intValue())))
+                .andExpect(jsonPath("gameName", is(testGame.getGameName())))
+                .andExpect(jsonPath("numOfPlayersJoined", is(testGame.getNumOfPlayersJoined())))
+
+        ;
+    }
+
+
+
+
     private String asJsonString(final Object object) {
         try {
             return new ObjectMapper().writeValueAsString(object);
