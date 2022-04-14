@@ -76,6 +76,30 @@ public class GameService {
         return game;
     }
 
+    // NOT NEEDED AS IT IS HANDLED IN THE leaveWaitingArea
+//    // GAME DELETION - when last player leaves waiting area
+//    public void deleteGameInWaitingArea(Long gameId, String token) {
+//        // finding game
+//        Game game = gameRepository.findByGameId(gameId);
+//        if (game == null) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game with given Id doesn't exist!");
+//        }
+//        // check whether game has only one player, and it is the player that made the request
+//        if (game.getNumOfPlayersJoined() > 1) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game has more than one player!");
+//        }
+//        User user = userRepository.findByToken(token); // ! PLAYER ID SAME AS USER ID !
+//        List<Long> playerIds = game.getPlayerIds();
+//        if (!playerIds.contains(user.getUserId())) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not part of this game!");
+//        }else{
+//            // delete game
+//            gameRepository.delete(game);
+//            gameRepository.flush();
+//        }
+//    }
+
+
         //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
 
@@ -110,9 +134,23 @@ public class GameService {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
+
+                // if the lobby is full, start the game
+                if (game.getNumOfPlayersJoined() == 4)
+                    this.startGame(game);
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
+    }
+
+    // helper method to actually start the game
+    /* TODO: create a new GameRound (add it to the list of GameRounds and set
+        it as the currentRound) and add a black card to this GameRound.
+        Furthermore, create a method to give every player a role as well as
+        10 white cards.
+     */
+    private void startGame(Game game) {
+        return;
     }
 
     // method to update player count in the waiting area
@@ -132,8 +170,16 @@ public class GameService {
         User userToRemove = userRepository.findByToken(token);
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
-            return;
-        removePlayerFromGame(gameToLeave, userToRemove);
+            return; // if it does not contain then return
+
+        // if contains more than one player then just remove the player
+        if (gameToLeave.getNumOfPlayersJoined() > 1) {
+            removePlayerFromGame(gameToLeave, userToRemove);
+        } else {
+            // if there is only one player left, delete the game
+            gameRepository.delete(gameToLeave);
+            gameRepository.flush();
+        }
     }
 
 

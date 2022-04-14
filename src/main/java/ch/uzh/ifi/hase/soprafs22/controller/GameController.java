@@ -72,6 +72,18 @@ public class GameController {
 
     }
 
+
+
+//    // GAME DELETION
+//    @DeleteMapping("/games/{gameId}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteGame(@RequestHeader("Authorization") String token, @PathVariable Long gameId){
+//        // checking if the user is authorized
+//        userService.checkIfAuthorized(token);
+//        gameService.deleteGameInWaitingArea(gameId, token); // game is deleted
+//    }
+
+
     @PutMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -80,6 +92,7 @@ public class GameController {
         Game joinedGame = gameService.joinGame(gamePutDTO.getGameId(),token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(joinedGame);
     }
+
 
     @GetMapping("/games/waitingArea/{gameId}")
     @ResponseStatus(HttpStatus.OK)
@@ -99,6 +112,17 @@ public class GameController {
         userService.checkIfAuthorized(token);
         gameService.leaveWaitingArea(gameId, token);
     }
+
+    /*
+     TODO: create an endpoint for the /gameRound which will be used to
+      fetch and display the black card, the roundNumber and the played Cards
+     */
+
+    /*
+     TODO: Create an endpoint for the /player which will be used to
+      fetch and display the white cards and the current role
+     */
+
 
 
 }

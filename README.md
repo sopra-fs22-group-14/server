@@ -16,6 +16,12 @@ Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/)
 
 To build right click the `build.gradle` file and choose `Run Build`
 
+## Database setup to see our schema/persistent data
+
+Since we use a persistent non-volatile database from Postgres and run the DB-instance on AWS, there are some further steps necessary to see the persistent data:
+The following link will guide you through the necessary steps:
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html
+
 ### VS Code
 The following extensions will help you to run it more easily:
 -   `pivotal.vscode-spring-boot`
