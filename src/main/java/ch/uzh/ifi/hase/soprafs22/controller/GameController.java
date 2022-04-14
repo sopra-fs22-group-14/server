@@ -113,5 +113,16 @@ public class GameController {
         gameService.leaveWaitingArea(gameId, token);
     }
 
+    /*
+     TODO: create an endpoint for the /gameRound which will be used to
+      fetch and display the black card, the roundNumber and the played Cards
+     */
+
+    /*
+     TODO: Create an endpoint for the /player which will be used to
+      fetch and display the white cards and the current role
+     */
+
+
 
 }
