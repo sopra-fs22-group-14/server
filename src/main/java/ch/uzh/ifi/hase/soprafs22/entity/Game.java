@@ -41,6 +41,15 @@ public class Game implements Serializable{
     @Column
     private int numOfRounds;
 
+    @Column
+    //this will start from zero when game is initialized
+    // during the first round it will be 1 then for the second round two etc
+    // this way we can keep track of number of rounds and so that we can change card Czar by modulo 4
+    private int currentGameRoundIndex;
+
+    @Column
+    private int currentGameRoundId;
+
     //TODO we might need a gamestatus
 
     //TODO just store Id's or the object's
@@ -54,7 +63,9 @@ public class Game implements Serializable{
     //TODO this also works decide which one to use
     //@OneToMany
     //private List<Player> playerList = new ArrayList<>();
-
+    @Column()
+    @ElementCollection
+    private List<Long> roundIds = new ArrayList<>();
     //@Column(nullable = false)
     //@ElementCollection
     //private List<GameRound> rounds = new ArrayList<>;

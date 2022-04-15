@@ -1,10 +1,9 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs22.entity.Game;
-import ch.uzh.ifi.hase.soprafs22.entity.Player;
-import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.entity.*;
 import ch.uzh.ifi.hase.soprafs22.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs22.repository.GameRoundRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,20 @@ public class GameService {
     private Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
+    private final GameRoundRepository gameRoundRepository;
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
+    private final GameRoundService gameRoundService;
 
     //TODO I am not sure that we need autowired here. But probably we need since we have multiple repos
 
     @Autowired
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("playerRepository")PlayerRepository playerRepository,@Qualifier("userRepository") UserRepository userRepository) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, GameRoundService gameRoundService) {
         this.gameRepository = gameRepository;
+        this.gameRoundRepository = gameRoundRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
+        this.gameRoundService = gameRoundService;
     }
 
     public List<Game> getAllGames(){
@@ -62,6 +65,7 @@ public class GameService {
         game.setGameName(gameInput.getGameName());
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
+        game.setCurrentGameRoundIndex(0);
         game.setNumOfRounds(gameInput.getNumOfRounds());
         game.setGameEdition(gameInput.getGameEdition());
         // admin player is the one who creates game
@@ -71,7 +75,7 @@ public class GameService {
 
         game = gameRepository.saveAndFlush(game);
 
-        //TODO maybe we can add the game id to the players and remove them from the lobby
+
 
         return game;
     }
@@ -149,7 +153,17 @@ public class GameService {
         Furthermore, create a method to give every player a role as well as
         10 white cards.
      */
-    private void startGame(Game game) {
+   private void startGame(Game game) {
+        /*GameRound currentGameRound=gameRoundService.createNewRound(game);
+
+        for(long playerId: game.getPlayerIds()){
+
+        } */
+
+    
+
+
+
         return;
     }
 

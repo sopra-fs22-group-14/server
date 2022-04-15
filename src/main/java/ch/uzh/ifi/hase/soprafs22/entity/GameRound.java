@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,16 @@ public class GameRound {
     @Column(nullable = false)
     private int roundNumber;
 
-    //TODO just store Id's or the object's
-    //@OneToOne //correct to solve "'Basic' attribute type should not be 'Persistence Entity'"?
-    //@Column(nullable = false)
-    //private Card blackCard;
+    //TODO not sure about jsonignore properties
+    @OneToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JoinColumn
+    private Card blackCard;
+
+    // we might store the cardCzarId
+    //@Column
+    //private int cardCzarId;
+
 
     //@Column(nullable = false)
     //@ElementCollection
@@ -35,6 +42,7 @@ public class GameRound {
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection
+    // this list will  keep track of who played which card
     //private List<Player> accordingPlayer = new ArrayList<>;
 
     //@Column(nullable = false)
