@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.entity;
 
+import ch.uzh.ifi.hase.soprafs22.constant.CardColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,10 +21,14 @@ public class Card implements Serializable {
     @GeneratedValue
     private Long cardId;
 
-    @Column(nullable = false)
+    @Column()
     private boolean isWhite;
 
-    @Column(nullable = false)
+    @Column()
     private String cardText;
+
+    //@JoinColumn(name="cardId") //add FK
+    @Column()
+    private Long deckId;
 
 }

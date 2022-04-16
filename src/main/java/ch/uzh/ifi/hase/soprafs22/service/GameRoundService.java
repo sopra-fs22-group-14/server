@@ -21,6 +21,7 @@ public class GameRoundService {
 
     private Logger log = LoggerFactory.getLogger(GameRoundService.class);
 
+
     private GameRoundRepository gameRoundRepository;
     private final GameRepository gameRepository;
     private final CardRepository cardRepository;

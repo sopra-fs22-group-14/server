@@ -1,11 +1,9 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
+import ch.uzh.ifi.hase.soprafs22.constant.CardColor;
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.*;
-import ch.uzh.ifi.hase.soprafs22.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs22.repository.GameRoundRepository;
-import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
-import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs22.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -17,6 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,16 +33,21 @@ public class GameService {
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
     private final GameRoundService gameRoundService;
+    private final CardRepository cardRepository;
+
+    private final DeckRepository deckRepository;
 
     //TODO I am not sure that we need autowired here. But probably we need since we have multiple repos
 
     @Autowired
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, GameRoundService gameRoundService) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, GameRoundService gameRoundService, CardRepository cardRepository, DeckRepository deckRepository) {
         this.gameRepository = gameRepository;
         this.gameRoundRepository = gameRoundRepository;
         this.playerRepository = playerRepository;
         this.userRepository = userRepository;
         this.gameRoundService = gameRoundService;
+        this.cardRepository = cardRepository;
+        this.deckRepository = deckRepository;
     }
 
     public List<Game> getAllGames(){
@@ -74,8 +81,7 @@ public class GameService {
         addPlayerToGame(adminPlayer,game);
 
         game = gameRepository.saveAndFlush(game);
-
-
+        createDeck(game.getGameEdition());
 
         return game;
     }
@@ -121,6 +127,7 @@ public class GameService {
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
         // TODO delete player object for corresponding user?
         // TODO delete game if there are no users left
+        // TODO delete player completely
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId == userToRemove.getUserId()) {
                 gameToLeave.getPlayerIds().remove(playerId);
@@ -211,6 +218,72 @@ public class GameService {
         return player;
     }
 
+    public void createDeck(String gameEdition) {
+
+        Deck d = new Deck();
+        d.setDeckName(gameEdition);
+
+        List<Card> cards = new ArrayList<>();
+
+        String pathBlack;
+        String pathWhite;
+
+        List<String> blackCards = new ArrayList<>(); //test
+        List<String> whiteCards = new ArrayList<>(); //test
+
+        if (gameEdition.equals("regular")) {
+            pathBlack = "src/main/resources/CAH Base Set Black.csv";
+            pathWhite = "src/main/resources/CAH Base Set White.csv";
+        }
+        else {
+            pathBlack = "src/main/resources/CAH Family Edition Black.csv";
+            pathWhite = "src/main/resources/CAH Family Edition White.csv";
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(pathBlack))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Card c = new Card();
+                c.setCardText(line);
+                c.setWhite(false);
+                cards.add(c);
+                cardRepository.saveAndFlush(c);
+                blackCards.add(line); //test
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(pathWhite))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Card c = new Card();
+                c.setCardText(line);
+                c.setWhite(true);
+                cards.add(c);
+                cardRepository.saveAndFlush(c);
+                whiteCards.add(line); //test
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //printing all the cards
+        d.setCards(cards);
+        List<Card> test = d.getCards();
+        for(Card card: test){
+            System.out.println(card.getCardText());
+        }
+
+        //TODO delete deck/cards after game is finished
+        //deckRepository.saveAndFlush(d);
+
+        System.out.println("EntityDeck"); //test
+        System.out.println(d.getCards()); //test
+        System.out.println("Cards:"); //test
+        System.out.println(whiteCards); //test
+        System.out.println(blackCards); //test
+    }
 
 
 }
