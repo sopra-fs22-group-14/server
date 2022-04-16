@@ -21,13 +21,14 @@ public class Deck {
     @GeneratedValue
     private Long deckId;
 
-    @Column(nullable = false)
+    @Column()
     private String deckName;
 
     //TODO just store Id's or the object's
-    //@Column(nullable = false)
+    @Column()
     //@ElementCollection
-    //private List<Card> deck = new ArrayList<>;
+    @OneToMany
+    private List<Card> cards = new ArrayList<>();
 
 
 }

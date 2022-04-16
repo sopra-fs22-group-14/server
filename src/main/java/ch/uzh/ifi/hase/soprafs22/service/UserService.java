@@ -120,7 +120,6 @@ public class UserService {
 
     }
 
-
     public User logout(String token) {
         User userByToken=userRepository.findByToken(token);
         if (userByToken == null) {
