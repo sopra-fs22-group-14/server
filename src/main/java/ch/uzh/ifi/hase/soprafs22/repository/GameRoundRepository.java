@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository("gameRoundRepository") //repo inherits from JPA interface to where our User with its properties is stored
 public interface GameRoundRepository extends JpaRepository<GameRound, Long> {
-    Game findByRoundId(long roundId);
+    GameRound findByRoundId(long roundId);
 }

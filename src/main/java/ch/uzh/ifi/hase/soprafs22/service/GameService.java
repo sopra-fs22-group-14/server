@@ -19,8 +19,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -80,8 +82,11 @@ public class GameService {
 
         addPlayerToGame(adminPlayer,game);
 
+
+        Deck d=createDeck(game.getGameEdition());
+        game.setDeckID(d.getDeckId());
         game = gameRepository.saveAndFlush(game);
-        createDeck(game.getGameEdition());
+
 
         return game;
     }
@@ -145,7 +150,7 @@ public class GameService {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
-
+                gameRepository.saveAndFlush(game);
                 // if the lobby is full, start the game
                 if (game.getNumOfPlayersJoined() == 4)
                     this.startGame(game);
@@ -161,11 +166,40 @@ public class GameService {
         10 white cards.
      */
    private void startGame(Game game) {
-        /*GameRound currentGameRound=gameRoundService.createNewRound(game);
+       // get not played white cards
+        List <Card> whiteCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),true,false);
+        int upperbound=whiteCards.size();
+       int[] arr = new int[upperbound];
+       Random rand = new Random();
+       Set<Integer> unique = new HashSet<Integer>();
+       for (int i=0; i<40; i++)
+       {
+           int number = rand.nextInt(upperbound);
+           while (unique.contains(number)){
+               // `number` is a duplicate
+               number = rand.nextInt(upperbound);
+           }
+           arr[i] = number;
+           unique.add(number); // adding to the set
+       }
+       int card_Index=0;
+       for(long playerId: game.getPlayerIds()){
+           Player currentPlayer=playerRepository.findByPlayerId(playerId);
+           for(int i=0; i<10; i++){
+               Card currentCard=whiteCards.get(arr[card_Index]);
+               List <Card>playerCards=currentPlayer.getCardsOnHands();
+               playerCards.add(currentCard);
+               currentPlayer.setCardsOnHands(playerCards);
+               currentCard.setPlayed(true);
+               cardRepository.saveAndFlush(currentCard);
+               card_Index++;
 
-        for(long playerId: game.getPlayerIds()){
+           }
 
-        } */
+           playerRepository.saveAndFlush(currentPlayer);
+       }
+
+        GameRound currentGameRound=gameRoundService.startNewRound(game);
 
 
 
@@ -218,7 +252,7 @@ public class GameService {
         return player;
     }
 
-    public void createDeck(String gameEdition) {
+    public Deck createDeck(String gameEdition) {
 
         Deck d = new Deck();
         d.setDeckName(gameEdition);
@@ -245,6 +279,8 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(false);
+                c.setGameEdition(gameEdition);
+                c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
                 blackCards.add(line); //test
@@ -259,6 +295,8 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(true);
+                c.setGameEdition(gameEdition);
+                c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
                 whiteCards.add(line); //test
@@ -270,19 +308,36 @@ public class GameService {
 
         //printing all the cards
         d.setCards(cards);
+        d=deckRepository.save(d);
         List<Card> test = d.getCards();
         for(Card card: test){
             System.out.println(card.getCardText());
+            card.setDeckId(d.getDeckId());
+            cardRepository.saveAndFlush(card);
         }
 
         //TODO delete deck/cards after game is finished
-        //deckRepository.saveAndFlush(d);
 
+        deckRepository.flush();
         System.out.println("EntityDeck"); //test
         System.out.println(d.getCards()); //test
         System.out.println("Cards:"); //test
         System.out.println(whiteCards); //test
         System.out.println(blackCards); //test
+        return d;
+    }
+
+    public Player getPlayer(String token){
+       User userByToken=userRepository.findByToken(token);
+       Player playerToGet=playerRepository.findByPlayerId(userByToken.getUserId());
+       return playerToGet;
+    }
+
+    public GameRound getGameRound(long gameId){
+       Game gameById=gameRepository.findByGameId(gameId);
+       GameRound gameRoundToGet=gameRoundRepository.findByRoundId(gameById.getCurrentGameRoundId());
+       return gameRoundToGet;
+
     }
 
 

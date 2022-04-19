@@ -33,7 +33,7 @@ public class Player implements Serializable {
     private boolean isPlaying;
 
     @Column(nullable = false)
-    private int RoundsWon;
+    private int roundsWon;
 
     //TODO just store Id's or the object's
     @Column(nullable = false)

@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.Game;
+import ch.uzh.ifi.hase.soprafs22.entity.GameRound;
+import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
@@ -17,6 +19,7 @@ public class GameController {
 
     private final GameService gameService;
     private final UserService userService;
+
 
     GameController(GameService gameService, UserService userService) {
         this.gameService = gameService;
@@ -122,6 +125,24 @@ public class GameController {
      TODO: Create an endpoint for the /player which will be used to
       fetch and display the white cards and the current role
      */
+    @GetMapping("/player")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public PlayerGetDTO getPlayer(@RequestHeader("Authorization") String token){
+        userService.checkIfAuthorized(token);
+        Player requestedPlayer=gameService.getPlayer(token);
+        return DTOMapper.INSTANCE.convertEntityToPlayerGetDTO(requestedPlayer);
+
+    }
+    //need to test this controller
+    @GetMapping("/{gameId}/gameround")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameRoundGetDTO getRound(@RequestHeader("Authorization") String token,@PathVariable long gameId){
+        userService.checkIfAuthorized(token);
+        GameRound requestedGameRound=gameService.getGameRound(gameId);
+        return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
+    }
 
 
 

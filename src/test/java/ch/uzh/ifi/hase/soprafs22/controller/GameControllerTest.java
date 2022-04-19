@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs22.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs22.service.GameRoundService;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 
@@ -46,6 +48,10 @@ public class GameControllerTest {
 
     @MockBean
     private GameService gameService;
+
+    @MockBean
+    private GameRoundService gameRoundService;
+
     @MockBean
     private UserService userService;
 
@@ -138,6 +144,46 @@ public class GameControllerTest {
 
         ;
     }
+    @Test
+    void givenGames_whenGetPlayer_thenReturnJsonArray() throws Exception{
+        Player testPlayer=new Player();
+        testPlayer.setPlayerId(1L);
+        testPlayer.setPlaying(true);
+        testPlayer.setCardCzar(true);
+        testPlayer.setRoundsWon(0);
+        testPlayer.setPlayerName("abc");
+        given(gameService.getPlayer(Mockito.anyString())).willReturn(testPlayer);
+        MockHttpServletRequestBuilder getRequest = get("/player").contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.playerId", is(testPlayer.getPlayerId().intValue())))
+                .andExpect(jsonPath("$.playerName", is(testPlayer.getPlayerName())))
+                .andExpect(jsonPath("$.roundsWon", is(testPlayer.getRoundsWon())));
+
+
+    }
+    @Test
+    void givenGames_whenGetGameRound_thenReturnJsonArray() throws Exception{
+        GameRound testRound=new GameRound();
+        testRound.setRoundId(1L);
+        testRound.setCardCzarId(1L);
+        Game testGame=new Game();
+        testGame.setGameId(2L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        given(gameService.getGameRound(anyLong())).willReturn(testRound);
+        MockHttpServletRequestBuilder getRequest = get(String.format("/%s/gameround", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.roundId", is(testRound.getRoundId().intValue())))
+                .andExpect(jsonPath("$.cardCzarId", is(testRound.getCardCzarId().intValue())));
+
+    }
+
+
 
 
 

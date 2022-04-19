@@ -22,8 +22,8 @@ public class GameRound {
     @GeneratedValue
     private Long roundId;
 
-    @Column(nullable = false)
-    private int roundNumber;
+    //@Column(nullable = false)
+    //private int roundNumber;
 
     //TODO not sure about jsonignore properties
     @OneToOne
@@ -32,8 +32,8 @@ public class GameRound {
     private Card blackCard;
 
     // we might store the cardCzarId
-    //@Column
-    //private int cardCzarId;
+    @Column
+    private Long cardCzarId;
 
 
     //@Column(nullable = false)

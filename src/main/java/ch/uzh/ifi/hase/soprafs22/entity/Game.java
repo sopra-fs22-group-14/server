@@ -48,7 +48,10 @@ public class Game implements Serializable{
     private int currentGameRoundIndex;
 
     @Column
-    private int currentGameRoundId;
+    private Long currentGameRoundId;
+
+    @Column
+    private Long deckID;
 
     //TODO we might need a gamestatus
 
@@ -66,6 +69,8 @@ public class Game implements Serializable{
     @Column()
     @ElementCollection
     private List<Long> roundIds = new ArrayList<>();
+
+
     //@Column(nullable = false)
     //@ElementCollection
     //private List<GameRound> rounds = new ArrayList<>;

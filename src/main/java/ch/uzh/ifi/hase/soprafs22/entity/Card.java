@@ -28,7 +28,10 @@ public class Card implements Serializable {
     private String cardText;
 
     //@JoinColumn(name="cardId") //add FK
-    @Column()
+    @Column
+    private String gameEdition;
+    @Column
     private Long deckId;
-
+    @Column
+    private boolean isPlayed;
 }
