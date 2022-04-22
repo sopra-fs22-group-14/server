@@ -262,8 +262,8 @@ public class GameService {
         String pathBlack;
         String pathWhite;
 
-        List<String> blackCards = new ArrayList<>(); //test
-        List<String> whiteCards = new ArrayList<>(); //test
+        List<String> blackCards = new ArrayList<>(); //test printing out all the Cards on Console
+        List<String> whiteCards = new ArrayList<>(); //test printing out all the Cards on Console
 
         if (gameEdition.equals("regular")) {
             pathBlack = "src/main/resources/CAH Base Set Black.csv";
@@ -279,11 +279,11 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(false);
-                c.setGameEdition(gameEdition);
+                c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
                 c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
-                blackCards.add(line); //test
+                blackCards.add(line); //test printing out all the Cards on Console
             }
         }
         catch (IOException e) {
@@ -295,18 +295,18 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(true);
-                c.setGameEdition(gameEdition);
+                c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
                 c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
-                whiteCards.add(line); //test
+                whiteCards.add(line);//test printing out all the Cards on Console
             }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        //printing all the cards
+        //test printing out all the Cards on Console
         d.setCards(cards);
         d=deckRepository.save(d);
         List<Card> test = d.getCards();
@@ -319,11 +319,11 @@ public class GameService {
         //TODO delete deck/cards after game is finished
 
         deckRepository.flush();
-        System.out.println("EntityDeck"); //test
-        System.out.println(d.getCards()); //test
-        System.out.println("Cards:"); //test
-        System.out.println(whiteCards); //test
-        System.out.println(blackCards); //test
+        System.out.println("EntityDeck"); //test printing out all the Cards on Console
+        System.out.println(d.getCards()); //test printing out all the Cards on Console
+        System.out.println("Cards:"); //test printing out all the Cards on Console
+        System.out.println(whiteCards); //test printing out all the Cards on Console
+        System.out.println(blackCards); //test printing out all the Cards on Console
         return d;
     }
 
