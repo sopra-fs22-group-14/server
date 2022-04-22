@@ -30,9 +30,12 @@ public class UserServiceTest {
     // given
     testUser = new User();
     testUser.setUserId(1L);
+    testUser.setPassword("testPassword");
     testUser.setUsername("testUsername");
 
-    // when -> any object is being save in the userRepository -> return the dummy
+
+
+      // when -> any object is being save in the userRepository -> return the dummy
     // testUser
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
   }
@@ -48,8 +51,9 @@ public class UserServiceTest {
 
     assertEquals(testUser.getUserId(), createdUser.getUserId());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
+    assertEquals(testUser.getPassword(), createdUser.getPassword());
     assertNotNull(createdUser.getToken());
-    assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
+    assertEquals(UserStatus.ONLINE, createdUser.getStatus());
   }
 
   @Test
@@ -58,7 +62,7 @@ public class UserServiceTest {
     userService.createUser(testUser);
 
     // when -> setup additional mocks for UserRepository
-    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(null);
+    Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
     // then -> attempt to create second user with same user -> check that an error
     // is thrown

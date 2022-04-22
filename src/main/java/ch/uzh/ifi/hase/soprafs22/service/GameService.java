@@ -279,7 +279,7 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(false);
-                c.setGameEdition(gameEdition);
+                c.setGameEdition(gameEdition);  // Ege needed to test if everything works --> can be deleted
                 c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
@@ -295,7 +295,7 @@ public class GameService {
                 Card c = new Card();
                 c.setCardText(line);
                 c.setWhite(true);
-                c.setGameEdition(gameEdition);
+                c.setGameEdition(gameEdition); // Ege needed to test if everything works --> can be deleted
                 c.setPlayed(false);
                 cards.add(c);
                 cardRepository.saveAndFlush(c);
