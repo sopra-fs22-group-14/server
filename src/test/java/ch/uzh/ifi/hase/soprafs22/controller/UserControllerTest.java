@@ -63,7 +63,6 @@ public class UserControllerTest {
     mockMvc.perform(getRequest).andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-         .andExpect(jsonPath("$[0].username", is(user.getUsername())))
         .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
   }
 
@@ -73,19 +72,17 @@ public class UserControllerTest {
     User user = new User();
     user.setUserId(1L);
     user.setUsername("testUsername");
-    user.setPassword("Test Password");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();
     //userPostDTO.setName("Test User");
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setPassword("Test Password");
 
     given(userService.createUser(Mockito.any())).willReturn(user);
 
     // when/then -> do the request + validate the result
-    MockHttpServletRequestBuilder postRequest = post("/users/register")
+    MockHttpServletRequestBuilder postRequest = post("/users")
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(userPostDTO));
 
@@ -93,7 +90,8 @@ public class UserControllerTest {
     mockMvc.perform(postRequest)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", is(user.getUserId().intValue())))
-        .andExpect(jsonPath("$.token", is(user.getToken())));
+        .andExpect(jsonPath("$.username", is(user.getUsername())))
+        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
 
   /**
