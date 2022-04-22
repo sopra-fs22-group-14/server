@@ -48,8 +48,6 @@ public class UserController {
     @PostMapping("/users/register")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    /** PRODUCTION READY*/
-    /** SZYMON */
     public UserLoginDTO createUser(@RequestBody UserPostDTO userPostDTO) {
         // convert API user to internal representation
         User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
