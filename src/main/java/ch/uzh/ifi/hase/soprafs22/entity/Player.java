@@ -23,21 +23,20 @@ public class Player implements Serializable {
     @Id
     private Long playerId;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String playerName;
 
-    @Column(nullable = false)
+    @Column
     private boolean isCardCzar;
 
-    @Column(nullable = false)
+    @Column
     private boolean isPlaying;
 
-    @Column(nullable = false)
+    @Column
     private int roundsWon;
 
     //TODO just store Id's or the object's
-    @Column(nullable = false)
-
+    @Column
     @OneToMany
     private List<Card> cardsOnHands=new ArrayList<>();
 

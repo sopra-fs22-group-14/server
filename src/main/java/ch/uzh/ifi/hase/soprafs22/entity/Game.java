@@ -26,13 +26,13 @@ public class Game implements Serializable{
     @GeneratedValue
     private Long gameId;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String gameName;
 
-    @Column(nullable = false)
+    @Column
     private boolean cardCzarMode;
 
-    @Column(nullable = false)
+    @Column
     private String gameEdition;
 
     @Column
@@ -59,14 +59,14 @@ public class Game implements Serializable{
     //@Column(nullable = false, unique=true)
     //@ElementCollection
     //private List<Player> playerList = new ArrayList<>;
-    @Column()
+    @Column
     @ElementCollection
     private List<Long> playerIds = new ArrayList<>();
 
     //TODO this also works decide which one to use
     //@OneToMany
     //private List<Player> playerList = new ArrayList<>();
-    @Column()
+    @Column
     @ElementCollection
     private List<Long> roundIds = new ArrayList<>();
 

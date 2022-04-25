@@ -24,6 +24,7 @@ public class UserRepositoryIntegrationTest {
     // given
     User user = new User();
     user.setUsername("firstname@lastname");
+    user.setPassword("passWord");
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
 
@@ -36,6 +37,7 @@ public class UserRepositoryIntegrationTest {
     // then
     assertNotNull(found.getUserId());
     assertEquals(found.getUsername(), user.getUsername());
+    assertEquals(found.getPassword(), user.getPassword());
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());

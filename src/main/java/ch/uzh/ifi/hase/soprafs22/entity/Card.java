@@ -21,17 +21,19 @@ public class Card implements Serializable {
     @GeneratedValue
     private Long cardId;
 
-    @Column()
+    @Column
     private boolean isWhite;
 
-    @Column()
+    @Column
     private String cardText;
 
     //@JoinColumn(name="cardId") //add FK
     @Column
     private String gameEdition;
+
     @Column
     private Long deckId;
+
     @Column
     private boolean isPlayed;
 }
