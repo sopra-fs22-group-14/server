@@ -20,7 +20,11 @@ To build right click the `build.gradle` file and choose `Run Build`
 
 Since we use a persistent non-volatile database from Postgres and run the DB-instance on AWS, there are some further steps necessary to see the persistent data:
 The following link will guide you through the necessary steps:
+
 https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html
+
+Sidenote: To gain access when developing, the environment variables with the corresponding credentials must have been set locally
+
 
 ### VS Code
 The following extensions will help you to run it more easily:
