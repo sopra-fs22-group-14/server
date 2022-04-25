@@ -36,6 +36,7 @@ import static org.mockito.BDDMockito.given;
 
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -180,6 +181,68 @@ public class GameControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.roundId", is(testRound.getRoundId().intValue())))
                 .andExpect(jsonPath("$.cardCzarId", is(testRound.getCardCzarId().intValue())));
+
+    }
+    @Test
+    void givenGame_whenLeaveGame_return_Ok() throws Exception {
+        Game testGame=new Game();
+        testGame.setGameId(1L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        List<Long> playerIds = new ArrayList<>();
+        playerIds.add(1L);
+        testGame.setPlayerIds(playerIds);
+
+        Player testPlayer=new Player();
+        testPlayer.setPlayerId(1L);
+        testPlayer.setPlaying(true);
+        testPlayer.setCardCzar(true);
+        testPlayer.setRoundsWon(0);
+        testPlayer.setPlayerName("abc");
+
+        given(gameService.getGame(1L)).willReturn(testGame);
+        given(playerRepository.findByPlayerId(3L)).willReturn(testPlayer);
+
+        doNothing().when(gameService).leaveWaitingArea(anyLong(),Mockito.anyString());
+        GamePutDTO gamePutDTO = new GamePutDTO();
+        gamePutDTO.setGameId(1L);
+
+        MockHttpServletRequestBuilder putRequest = put(String.format("/games/waitingArea/%s", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        mockMvc.perform(putRequest).andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    void givenGame_whenUpdateCount_return_Ok() throws Exception{
+
+        Game testGame=new Game();
+        testGame.setGameId(1L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        List<Long> playerIds = new ArrayList<>();
+        playerIds.add(1L);
+        testGame.setPlayerIds(playerIds);
+
+        Player testPlayer=new Player();
+        testPlayer.setPlayerId(1L);
+        testPlayer.setPlaying(true);
+        testPlayer.setCardCzar(true);
+        testPlayer.setRoundsWon(0);
+        testPlayer.setPlayerName("abc");
+        given(gameService.updatePlayerCount(anyLong(),Mockito.anyString())).willReturn(testGame);
+        MockHttpServletRequestBuilder getRequest = get(String.format("/games/waitingArea/%s", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        // then
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.gameId", is(testGame.getGameId().intValue())))
+                .andExpect(jsonPath("$.gameName", is(testGame.getGameName())))
+                .andExpect(jsonPath("$.numOfPlayersJoined", is(testGame.getNumOfPlayersJoined())));
 
     }
 

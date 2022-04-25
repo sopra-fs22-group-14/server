@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -25,13 +26,15 @@ public class GameRoundService {
     private final PlayerRepository playerRepository;
     private final CardRepository cardRepository;
     private final DeckRepository deckRepository;
+    private final UserRepository userRepository;
 
-    public GameRoundService(@Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("gameRepository") GameRepository gameRepository, PlayerRepository playerRepository, @Qualifier("cardRepository") CardRepository cardRepository, DeckRepository deckRepository) {
+    public GameRoundService(@Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("gameRepository") GameRepository gameRepository, PlayerRepository playerRepository, @Qualifier("cardRepository") CardRepository cardRepository, DeckRepository deckRepository, UserRepository userRepository) {
         this.gameRoundRepository = gameRoundRepository;
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.cardRepository = cardRepository;
         this.deckRepository = deckRepository;
+        this.userRepository = userRepository;
     }
     public GameRound createNewRound(Game game){
         if(game.getRoundIds().size()==game.getNumOfRounds()){
@@ -78,6 +81,46 @@ public class GameRoundService {
         int currentGameRoundIndex=game.getCurrentGameRoundIndex();
         int nextCardCzarPos=(currentGameRoundIndex-1)%4;
         return game.getPlayerIds().get(nextCardCzarPos);
+
+    }
+    public GameRound playCard(Long gameRoundId,String token,Long cardId){
+        User userByToken=userRepository.findByToken(token);
+        GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
+        if(currentGameRound.getCardAndPlayerIds().containsValue(userByToken.getUserId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "player already played a card!");
+        }
+        Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
+        List<Card>currentCardsOnHand=currentPlayer.getCardsOnHands();
+        Card playedCard=cardRepository.findByCardId(cardId);
+        Map<Long,Long> currentCardAndPlayerIds=currentGameRound.getCardAndPlayerIds();
+        currentCardAndPlayerIds.put(cardId,currentPlayer.getPlayerId());
+        currentGameRound.setCardAndPlayerIds(currentCardAndPlayerIds);
+        List<Card>currentPlayedCards=currentGameRound.getPlayedCards();
+        currentPlayedCards.add(playedCard);
+        currentGameRound.setPlayedCards(currentPlayedCards);
+        currentCardsOnHand.remove(playedCard);
+        currentPlayer.setCardsOnHands(currentCardsOnHand);
+        currentGameRound=gameRoundRepository.save(currentGameRound);
+        gameRoundRepository.flush();
+        playerRepository.saveAndFlush(currentPlayer);
+
+        return currentGameRound;
+
+    }
+    public void chooseRoundWinner(Long gameRoundId,String token,Long cardId){
+        User userByToken=userRepository.findByToken(token);
+        Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
+        if(!currentPlayer.isCardCzar()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "player is not card Czar");
+        }
+        GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
+        Long currentRoundWinnerId=currentGameRound.getCardAndPlayerIds().get(cardId);
+        currentGameRound.setRoundWinnerId(currentRoundWinnerId);
+        Player currentWinner=playerRepository.findByPlayerId(currentRoundWinnerId);
+        String currentRoundWinnerName=currentWinner.getPlayerName();
+        currentGameRound.setRoundWinnerName(currentRoundWinnerName);
+        gameRoundRepository.saveAndFlush(currentGameRound);
+
 
     }
 

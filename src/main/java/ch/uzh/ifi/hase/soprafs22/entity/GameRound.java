@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -35,10 +37,21 @@ public class GameRound {
     @Column
     private Long cardCzarId;
 
+    //id of player and id of played card
+    @Column()
+    @ElementCollection
+    private Map<Long,Long> cardAndPlayerIds = new HashMap<>();
 
-    //@Column(nullable = false)
-    //@ElementCollection
-    //private List<Long> playedCardsId = new ArrayList<>();
+    @Column()
+    @OneToMany
+    private List<Card> playedCards = new ArrayList<>(); // for displaying played cards in the gameround
+
+    @Column
+    private String roundWinnerName;
+
+    @Column
+    private Long roundWinnerId;
+
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection
