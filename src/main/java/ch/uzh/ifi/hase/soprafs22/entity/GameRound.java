@@ -24,6 +24,9 @@ public class GameRound {
     @GeneratedValue
     private Long roundId;
 
+    @Column
+    private Long correspondingGameId;
+
     //@Column(nullable = false)
     //private int roundNumber;
 

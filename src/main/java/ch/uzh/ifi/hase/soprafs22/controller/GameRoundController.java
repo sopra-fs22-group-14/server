@@ -1,11 +1,11 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.GameRound;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameRoundGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameRoundPostDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameRoundService;
+import ch.uzh.ifi.hase.soprafs22.service.GameService;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,12 @@ public class GameRoundController {
 
     private final GameRoundService gameRoundService;
     private final UserService userService;
+    private final GameService gameService;
 
-    GameRoundController(GameRoundService gameRoundService, UserService userService) {
+    GameRoundController(GameRoundService gameRoundService, UserService userService, GameService gameService) {
         this.gameRoundService = gameRoundService;
         this.userService = userService;
+        this.gameService = gameService;
     }
 
     @PostMapping("/{gameRoundId}/white")
@@ -35,7 +37,8 @@ public class GameRoundController {
     @ResponseBody
     public void chooseRoundWinner(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
-        gameRoundService.chooseRoundWinner(gameRoundId,token,gameRoundPostDTO.getCardId());
+        String roundWinner = gameRoundService.chooseRoundWinner(gameRoundId,token,gameRoundPostDTO.getCardId());
+        gameService.updateLatestRoundWinner(roundWinner, gameRoundId, gameRoundPostDTO.getCardId());
     }
 
 

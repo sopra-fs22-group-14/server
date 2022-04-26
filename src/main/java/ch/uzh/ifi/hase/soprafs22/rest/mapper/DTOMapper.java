@@ -46,13 +46,15 @@ public interface DTOMapper {
     UserLoginDTO convertEntityToUserLoginDTO(User user);
 
 
-    // FOR GETTING THE GAME - LOBBY
+    // FOR GETTING THE GAME - LOBBY (and latest round winner)
     @Mapping(source = "gameId", target = "gameId")
     @Mapping(source = "gameName", target = "gameName")
     @Mapping(source = "cardCzarMode", target = "cardCzarMode")
     @Mapping(source = "gameEdition", target = "gameEdition")
     @Mapping(source = "numOfPlayersJoined", target = "numOfPlayersJoined")
     @Mapping(source = "numOfRounds", target = "numOfRounds")
+    @Mapping(source = "latestRoundWinner", target = "latestRoundWinner")
+    @Mapping(source = "latestWinningCardText", target = "latestWinningCardText")
     GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "gameName", target = "gameName")

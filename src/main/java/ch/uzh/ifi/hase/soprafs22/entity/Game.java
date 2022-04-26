@@ -42,6 +42,14 @@ public class Game implements Serializable{
     private int numOfRounds;
 
     @Column
+    // this value will be used to display the winner in the front end
+    private String latestRoundWinner;
+
+    @Column
+    // this value will be used to display the winner in the front end
+    private String latestWinningCardText;
+
+    @Column
     //this will start from zero when game is initialized
     // during the first round it will be 1 then for the second round two etc
     // this way we can keep track of number of rounds and so that we can change card Czar by modulo 4

@@ -64,6 +64,15 @@ public class GameController {
         */
     }
 
+    @GetMapping("/{gameId}/latestRoundWinner")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO getLatestRoundWinner(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
+        userService.checkIfAuthorized(token);
+        Game requestedGame = gameService.getGame(gameId);
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
+    }
+
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody

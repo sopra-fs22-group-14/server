@@ -19,4 +19,6 @@ public class GameGetDTO {
     private String gameEdition;
     private int numOfPlayersJoined;
     private int numOfRounds;
+    private String latestRoundWinner;
+    private String latestWinningCardText;
 }
