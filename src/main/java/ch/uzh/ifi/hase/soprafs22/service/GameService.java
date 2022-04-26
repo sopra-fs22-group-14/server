@@ -131,10 +131,9 @@ public class GameService {
 
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
         // TODO delete player object for corresponding user?
-        // TODO delete game if there are no users left
         // TODO delete player completely
         for (Long playerId : gameToLeave.getPlayerIds()) {
-            if (playerId == userToRemove.getUserId()) {
+            if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
                 gameToLeave.decreasePlayers();
                 return;
