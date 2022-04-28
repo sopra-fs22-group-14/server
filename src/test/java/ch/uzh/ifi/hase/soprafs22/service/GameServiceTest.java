@@ -1,0 +1,235 @@
+package ch.uzh.ifi.hase.soprafs22.service;
+import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs22.entity.*;
+import ch.uzh.ifi.hase.soprafs22.repository.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+public class GameServiceTest {
+    @Mock
+    GameRepository gameRepository;
+
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    CardRepository cardRepository;
+    @Mock
+    DeckRepository deckRepository;
+    @InjectMocks
+    private GameService gameService;
+
+    @Mock
+    PlayerRepository playerRepository;
+    @InjectMocks
+    private User testUser;
+    @InjectMocks
+    private User testUser2;
+    @InjectMocks
+    private User testUser3;
+    @InjectMocks
+    private Game testGame;
+    @InjectMocks
+    private Player testPlayer;
+    @InjectMocks
+    private Player testPlayer2;
+    @InjectMocks
+    private Player testPlayer3;
+    @InjectMocks
+    private Card testCard;
+    @InjectMocks
+    private Deck testDeck;
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+
+        // given
+        testUser = new User();
+        testUser.setUserId(1L);
+        testUser.setPassword("testPassword");
+        testUser.setUsername("testUsername");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken("testToken");
+
+        testUser2=new User();
+        testUser2.setUserId(2L);
+        testUser2.setPassword("testPassword");
+        testUser2.setUsername("testUsername2");
+        testUser2.setStatus(UserStatus.ONLINE);
+        testUser2.setToken("testToken2");
+
+        testUser3=new User();
+        testUser3.setUserId(6L);
+        testUser3.setPassword("testPassword");
+        testUser3.setUsername("testUsername3");
+        testUser3.setStatus(UserStatus.OFFLINE);
+        testUser3.setToken("testToken3");
+
+        testPlayer=new Player();
+        testPlayer.setPlayerId(1L);
+        testPlayer.setPlayerName("testUsername");
+        testPlayer.setPlaying(true);
+        testPlayer.setCardCzar(false);
+
+        testPlayer2=new Player();
+        testPlayer2.setPlayerId(2L);
+        testPlayer2.setPlayerName("testUsername2");
+        testPlayer2.setPlaying(true);
+        testPlayer2.setCardCzar(false);
+
+        testPlayer3=new Player();
+        testPlayer3.setPlayerId(6L);
+        testPlayer3.setPlayerName("testUsername3");
+        testPlayer3.setPlaying(true);
+        testPlayer3.setCardCzar(false);
+
+
+
+
+        testGame=new Game();
+        testGame.setGameId(3L);
+        testGame.setGameName("testGame");
+        testGame.setNumOfPlayersJoined(1);
+        testGame.setNumOfRounds(8);
+        testGame.setCardCzarMode(true);
+        testGame.setCurrentGameRoundIndex(0);
+        testGame.setGameEdition("family");
+        testGame.setDeckID(4L);
+        List<Long> testGamePlayerIds=new ArrayList<>();
+        testGamePlayerIds.add(1L);
+        testGame.setPlayerIds(testGamePlayerIds);
+
+        testCard=new Card();
+        testCard.setCardId(4L);
+        testCard.setCardText("testCard");
+        testCard.setGameEdition("family");
+        testCard.setDeckId(5L);
+        testCard.setWhite(true);
+        testCard.setPlayed(false);
+
+        List<Card>testCards=new ArrayList<>();
+        testCards.add(testCard);
+
+        testDeck=new Deck();
+        testDeck.setDeckId(5L);
+        testDeck.setDeckName("family");
+        testDeck.setCards(testCards);
+        // when -> any object is being save in the userRepository -> return the dummy
+        // testUser
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser2);
+        //Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
+        //Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer2);
+
+
+    }
+    @Test
+    public void createGame_validInputs_success(){
+        Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+        Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer);
+        Mockito.when(cardRepository.save(Mockito.any())).thenReturn(testCard);
+        Mockito.when(deckRepository.save(Mockito.any())).thenReturn(testDeck);
+        Mockito.when(gameRepository.saveAndFlush(Mockito.any())).thenReturn(testGame);
+        Game createdGame=gameService.createNewGame(testGame,"testToken");
+        assertEquals(testGame.getGameId(), createdGame.getGameId());
+        assertEquals(testGame.getGameEdition(), createdGame.getGameEdition());
+        assertEquals(testGame.getNumOfPlayersJoined(), createdGame.getNumOfPlayersJoined());
+        assertEquals(testGame.getPlayerIds(),createdGame.getPlayerIds());
+        assertEquals(testGame.getDeckID(),createdGame.getDeckID());
+        assertEquals(testGame.isCardCzarMode(),createdGame.isCardCzarMode());
+        assertEquals(testGame.getCurrentGameRoundIndex(),createdGame.getCurrentGameRoundIndex());
+        assertEquals(testGame.getNumOfRounds(),createdGame.getNumOfRounds());
+        assertEquals(testGame.getGameName(),createdGame.getGameName());
+
+    }
+    @Test
+    public void createGame_duplicateInputs_throwException(){
+        String exceptionMessage = "GameName is already taken!";
+        Mockito.when(gameRepository.findByGameName(testGame.getGameName())).thenReturn(testGame);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.createNewGame(testGame,"testToken"));
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
+    @Test
+    public void joinGame_validInputs_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
+        Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer2);
+        Game joinedGame=gameService.joinGame(testGame.getGameId(),"testToken2");
+    }
+    @Test
+    public void joinGame_notLoggedIn_throwsException(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser3.getToken())).thenReturn(testUser3);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.joinGame(testGame.getGameId(),"testToken3"));
+        String exceptionMessage = "User is not logged in, cannot join a game!";
+        assertEquals(exceptionMessage,exception.getReason());
+    }
+    @Test
+    public void joinGame_playerAlreadyJoined_throwsException(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.joinGame(testGame.getGameId(),"testToken"));
+        String exceptionMessage = "The user is already in the game!";
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
+
+    @Test
+    public void getGame_validInput_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Game foundGame=gameService.getGame(testGame.getGameId());
+        assertEquals(testGame.getGameId(), testGame.getGameId());
+        assertEquals(testGame.getGameEdition(), testGame.getGameEdition());
+        assertEquals(testGame.getNumOfPlayersJoined(), testGame.getNumOfPlayersJoined());
+        assertEquals(testGame.getPlayerIds(),testGame.getPlayerIds());
+        assertEquals(testGame.getDeckID(),testGame.getDeckID());
+        assertEquals(testGame.isCardCzarMode(),testGame.isCardCzarMode());
+        assertEquals(testGame.getCurrentGameRoundIndex(),testGame.getCurrentGameRoundIndex());
+        assertEquals(testGame.getNumOfRounds(),testGame.getNumOfRounds());
+        assertEquals(testGame.getGameName(),testGame.getGameName());
+
+    }
+    @Test
+    public void getGame_notFound_throwsException(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(null);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.getGame(testGame.getGameId()));
+        String exceptionMessage = "Game with given Id doesn't exist!";
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
+    @Test
+    public void updatePlayerCount_validInput_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+        Game updatedGame=gameService.updatePlayerCount(testGame.getGameId(),"testToken");
+    }
+    @Test
+    public void updatePlayerCount_notJoined_throwsException(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.updatePlayerCount(testGame.getGameId(),"testToken2"));
+        String exceptionMessage = "User is not in this game, join first!";
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
+
+
+
+
+
+
+
+
+}

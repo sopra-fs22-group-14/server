@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -135,6 +136,9 @@ public class GameService {
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
+                Player playerToDelete=playerRepository.findByPlayerId(playerId);
+                playerRepository.delete(playerToDelete);
+                playerRepository.flush();
                 gameToLeave.decreasePlayers();
                 return;
             }
@@ -169,7 +173,7 @@ public class GameService {
         List <Card> whiteCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),true,false);
         int upperbound=whiteCards.size();
        int[] arr = new int[upperbound];
-       Random rand = new Random();
+       Random rand = new SecureRandom();
        Set<Integer> unique = new HashSet<Integer>();
        for (int i=0; i<40; i++)
        {
@@ -306,6 +310,7 @@ public class GameService {
         }
 
         //test printing out all the Cards on Console
+        
         cardRepository.flush();
         d.setCards(cards);
         d=deckRepository.save(d);
