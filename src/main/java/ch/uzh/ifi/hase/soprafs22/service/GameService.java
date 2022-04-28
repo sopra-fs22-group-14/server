@@ -204,10 +204,6 @@ public class GameService {
 
         GameRound currentGameRound=gameRoundService.startNewRound(game);
 
-
-
-
-
         return;
     }
 
@@ -343,6 +339,18 @@ public class GameService {
        GameRound gameRoundToGet=gameRoundRepository.findByRoundId(gameById.getCurrentGameRoundId());
        return gameRoundToGet;
 
+    }
+
+    // updates the round winner name and the round winning card text in the game
+    public void updateLatestRoundWinner(String roundWinner, Long gameRoundId, Long cardId) {
+        // first, get the corresponding game from the gameRoundId
+        GameRound gameRound = gameRoundRepository.findByRoundId(gameRoundId);
+        Game game = gameRepository.findByGameId(gameRound.getCorrespondingGameId());
+        Card winningCard = cardRepository.findByCardId(cardId);
+
+        // set the two values used for the displaying of the winner
+        game.setLatestRoundWinner(roundWinner);
+        game.setLatestWinningCardText(winningCard.getCardText());
     }
 
 

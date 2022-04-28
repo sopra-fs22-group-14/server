@@ -50,6 +50,7 @@ public class GameRoundService {
         //generate random values from 0-to untill the blackcards size
         int int_random = rand.nextInt(upperbound);
         gameRound.setBlackCard(blackCards.get(int_random)); // add a random black card to game round
+        gameRound.setCorrespondingGameId(game.getGameId()); // and add the corresponding gameId
         blackCards.get(int_random).setPlayed(true); //this blackcard is played in the database
         cardRepository.saveAndFlush(blackCards.get(int_random));
         gameRound = gameRoundRepository.save(gameRound);
@@ -64,6 +65,7 @@ public class GameRoundService {
         gameRepository.saveAndFlush(game);
         return gameRound;
     }
+
     //TODO how to change old cardCzarsStatus
     public GameRound startNewRound(Game game){
         GameRound currentGameRound=createNewRound(game);
@@ -108,7 +110,7 @@ public class GameRoundService {
         return currentGameRound;
 
     }
-    public void chooseRoundWinner(Long gameRoundId,String token,Long cardId){
+    public String chooseRoundWinner(Long gameRoundId,String token,Long cardId){
         User userByToken=userRepository.findByToken(token);
         Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
         if(!currentPlayer.isCardCzar()){
@@ -122,7 +124,12 @@ public class GameRoundService {
         currentGameRound.setRoundWinnerName(currentRoundWinnerName);
         gameRoundRepository.saveAndFlush(currentGameRound);
 
+        // after everything is done, start a new game round
+        Game currentGame = gameRepository.findByGameId(currentGameRound.getCorrespondingGameId());
+        startNewRound(currentGame);
 
+        // and return the old round winner
+        return currentRoundWinnerName;
     }
 
 
