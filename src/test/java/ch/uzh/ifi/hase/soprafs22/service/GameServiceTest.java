@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTest {
     @Mock
     GameRepository gameRepository;
+    @Mock
+    GameRoundRepository gameRoundRepository;
 
     @Mock
     UserRepository userRepository;
@@ -48,7 +50,11 @@ public class GameServiceTest {
     @InjectMocks
     private Card testCard;
     @InjectMocks
+    private Card testCard2;
+    @InjectMocks
     private Deck testDeck;
+    @InjectMocks
+    private GameRound testRound;
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -105,6 +111,7 @@ public class GameServiceTest {
         testGame.setCurrentGameRoundIndex(0);
         testGame.setGameEdition("family");
         testGame.setDeckID(4L);
+        testGame.setCurrentGameRoundId(8L);
         List<Long> testGamePlayerIds=new ArrayList<>();
         testGamePlayerIds.add(1L);
         testGame.setPlayerIds(testGamePlayerIds);
@@ -117,6 +124,14 @@ public class GameServiceTest {
         testCard.setWhite(true);
         testCard.setPlayed(false);
 
+        testCard2=new Card();
+        testCard2.setCardId(7L);
+        testCard2.setCardText("testBlackCard");
+        testCard2.setGameEdition("family");
+        testCard2.setDeckId(5L);
+        testCard2.setWhite(false);
+        testCard2.setPlayed(true);
+
         List<Card>testCards=new ArrayList<>();
         testCards.add(testCard);
 
@@ -126,6 +141,12 @@ public class GameServiceTest {
         testDeck.setCards(testCards);
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
+        testRound=new GameRound();
+        testRound.setRoundId(8L);
+        testRound.setCardCzarId(1L);
+        testRound.setBlackCard(testCard2);
+        testRound.setCorrespondingGameId(3L);
+
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser2);
         //Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
@@ -189,15 +210,15 @@ public class GameServiceTest {
     public void getGame_validInput_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Game foundGame=gameService.getGame(testGame.getGameId());
-        assertEquals(testGame.getGameId(), testGame.getGameId());
-        assertEquals(testGame.getGameEdition(), testGame.getGameEdition());
-        assertEquals(testGame.getNumOfPlayersJoined(), testGame.getNumOfPlayersJoined());
-        assertEquals(testGame.getPlayerIds(),testGame.getPlayerIds());
-        assertEquals(testGame.getDeckID(),testGame.getDeckID());
-        assertEquals(testGame.isCardCzarMode(),testGame.isCardCzarMode());
-        assertEquals(testGame.getCurrentGameRoundIndex(),testGame.getCurrentGameRoundIndex());
-        assertEquals(testGame.getNumOfRounds(),testGame.getNumOfRounds());
-        assertEquals(testGame.getGameName(),testGame.getGameName());
+        assertEquals(foundGame.getGameId(), testGame.getGameId());
+        assertEquals(foundGame.getGameEdition(), testGame.getGameEdition());
+        assertEquals(foundGame.getNumOfPlayersJoined(), testGame.getNumOfPlayersJoined());
+        assertEquals(foundGame.getPlayerIds(),testGame.getPlayerIds());
+        assertEquals(foundGame.getDeckID(),testGame.getDeckID());
+        assertEquals(foundGame.isCardCzarMode(),testGame.isCardCzarMode());
+        assertEquals(foundGame.getCurrentGameRoundIndex(),testGame.getCurrentGameRoundIndex());
+        assertEquals(foundGame.getNumOfRounds(),testGame.getNumOfRounds());
+        assertEquals(foundGame.getGameName(),testGame.getGameName());
 
     }
     @Test
@@ -222,6 +243,33 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.updatePlayerCount(testGame.getGameId(),"testToken2"));
         String exceptionMessage = "User is not in this game, join first!";
         assertEquals(exceptionMessage,exception.getReason());
+
+    }
+    @Test
+    public void getPlayer_success(){
+        Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+        Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
+        Player foundPlayer=gameService.getPlayer(testUser.getToken());
+        assertEquals(foundPlayer.getPlayerId(),testPlayer.getPlayerId());
+        assertEquals(foundPlayer.getPlayerName(),testPlayer.getPlayerName());
+        assertEquals(foundPlayer.getRoundsWon(),testPlayer.getRoundsWon());
+        assertEquals(foundPlayer.getCardsOnHands(),testPlayer.getCardsOnHands());
+
+    }
+
+    @Test
+    public void getGameRound_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(gameRoundRepository.findByRoundId(testGame.getCurrentGameRoundId())).thenReturn(testRound);
+        GameRound foundGameRound=gameService.getGameRound(testGame.getGameId());
+        assertEquals(foundGameRound.getRoundId(),testRound.getRoundId());
+    }
+    @Test
+    public void updateLatestRoundWinner_success(){
+        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
+        Mockito.when(gameRepository.findByGameId(testRound.getCorrespondingGameId())).thenReturn(testGame);
+        Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(testCard);
+        gameService.updateLatestRoundWinner("testWinner",testRound.getRoundId(),testCard.getCardId());
 
     }
 
