@@ -20,6 +20,7 @@ import java.util.Random;
 public class GameRoundService {
 
     private Logger log = LoggerFactory.getLogger(GameRoundService.class);
+    private static final Random rand = new Random();
 
 
     private final GameRoundRepository gameRoundRepository;
@@ -45,7 +46,6 @@ public class GameRoundService {
         //TODO how to select blackcard from repository and store cardCzar id
         Deck d=deckRepository.findByDeckId(game.getDeckID());
         List <Card> blackCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),false,false);
-        Random rand = new Random(); //instance of random class
         int upperbound = blackCards.size();
         //generate random values from 0-to untill the blackcards size
         int int_random = rand.nextInt(upperbound);
