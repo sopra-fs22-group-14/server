@@ -111,7 +111,7 @@ public class GameRoundControllerTest {
         testCardAndPlayerIds.put(4L,7L);
         testCardAndPlayerIds.put(5L,8L);
         gameRound.setCardAndPlayerIds(testCardAndPlayerIds);
-        doNothing().when(gameRoundService).chooseRoundWinner(anyLong(),Mockito.anyString(),anyLong());
+        given(gameRoundService.chooseRoundWinner(anyLong(),Mockito.anyString(),anyLong())).willReturn("testPlayer");
         GameRoundPostDTO gameRoundPostDTO = new GameRoundPostDTO();
         gameRoundPostDTO.setCardId(3L);
         MockHttpServletRequestBuilder postRequest = post(String.format("/%s/roundWinner", gameRound.getRoundId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken").content(asJsonString(gameRoundPostDTO));
