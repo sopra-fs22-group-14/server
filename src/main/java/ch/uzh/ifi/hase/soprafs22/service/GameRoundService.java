@@ -20,7 +20,7 @@ import java.util.Random;
 public class GameRoundService {
 
     private Logger log = LoggerFactory.getLogger(GameRoundService.class);
-    private static final Random rand = new Random();
+    private final static Random rand = new Random();
 
 
     private final GameRoundRepository gameRoundRepository;
@@ -95,6 +95,9 @@ public class GameRoundService {
         Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
         List<Card>currentCardsOnHand=currentPlayer.getCardsOnHands();
         Card playedCard=cardRepository.findByCardId(cardId);
+        if(!currentCardsOnHand.contains(playedCard)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "player doesn't have this card!");
+        }
         Map<Long,Long> currentCardAndPlayerIds=currentGameRound.getCardAndPlayerIds();
         currentCardAndPlayerIds.put(cardId,currentPlayer.getPlayerId());
         currentGameRound.setCardAndPlayerIds(currentCardAndPlayerIds);
