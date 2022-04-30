@@ -64,10 +64,10 @@ public class GameController {
         */
     }
 
-    @GetMapping("/{gameId}/latestRoundWinner")
+    @GetMapping("/games/{gameId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO getLatestRoundWinner(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
+    public GameGetDTO getGame(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
         userService.checkIfAuthorized(token);
         Game requestedGame = gameService.getGame(gameId);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);

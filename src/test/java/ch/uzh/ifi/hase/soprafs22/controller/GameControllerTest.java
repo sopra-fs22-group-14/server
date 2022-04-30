@@ -210,7 +210,7 @@ public class GameControllerTest {
         GamePutDTO gamePutDTO = new GamePutDTO();
         gamePutDTO.setGameId(1L);
 
-        MockHttpServletRequestBuilder putRequest = put(String.format("/games/waitingArea/%s", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        MockHttpServletRequestBuilder putRequest = put(String.format("/leave/%s", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
         mockMvc.perform(putRequest).andExpect(status().isOk())
         ;
     }
