@@ -70,6 +70,9 @@ public class GameService {
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
+        if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Player already joined another game.");
+        }
 
         Game game = new Game();
         game.setGameName(gameInput.getGameName());
@@ -118,16 +121,16 @@ public class GameService {
 
         //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
-
         if (game.getNumOfPlayersJoined() < 4){
             List<Long> players = game.getPlayerIds();
             players.add(playerToAdd.getPlayerId());
             game.setPlayerIds(players);
-            game.setNumOfPlayersJoined(game.getPlayerIds().size()); }
+            game.setNumOfPlayersJoined(game.getPlayerIds().size());}
 
         else{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
+
 
 
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
@@ -186,7 +189,7 @@ public class GameService {
            unique.add(number); // adding to the set
        }
        int card_Index=0;
-       for(long playerId: game.getPlayerIds()){
+       for(Long playerId: game.getPlayerIds()){
            Player currentPlayer=playerRepository.findByPlayerId(playerId);
            for(int i=0; i<10; i++){
                Card currentCard=whiteCards.get(arr[card_Index]);
@@ -219,7 +222,7 @@ public class GameService {
     }
 
     // method if a player decides to leave the waitingArea
-    public void leaveWaitingArea(Long gameId, String token) {
+    public void leaveGame(Long gameId, String token) {
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
         // if the user is not in the game, don't do anything (no error required)
@@ -251,6 +254,7 @@ public class GameService {
         return player;
     }
 
+
     public Deck createDeck(String gameEdition) {
 
         Deck d = new Deck();
@@ -269,8 +273,8 @@ public class GameService {
             pathWhite = "src/main/resources/CAH Base Set White.csv";
         }
         else {
-            pathBlack = "src/main/resources/CAH Family Edition Black.csv";
-            pathWhite = "src/main/resources/CAH Family Edition White.csv";
+            pathBlack = "src/main/resources/CAH Base Set White.csv";
+            pathWhite = "src/main/resources/CAH Base Set White.csv";
         }
         try (BufferedReader br = new BufferedReader(new FileReader(pathBlack))) {
             String line;
@@ -334,7 +338,7 @@ public class GameService {
        return playerToGet;
     }
 
-    public GameRound getGameRound(long gameId){
+    public GameRound getGameRound(Long gameId){
        Game gameById=gameRepository.findByGameId(gameId);
        GameRound gameRoundToGet=gameRoundRepository.findByRoundId(gameById.getCurrentGameRoundId());
        return gameRoundToGet;

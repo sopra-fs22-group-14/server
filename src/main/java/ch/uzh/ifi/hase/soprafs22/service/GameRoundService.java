@@ -68,8 +68,24 @@ public class GameRoundService {
 
     //TODO how to change old cardCzarsStatus
     public GameRound startNewRound(Game game){
+        List<Long> players = game.getPlayerIds();
+        for(Long playerId: players){
+            Player player = playerRepository.findByPlayerId(playerId);
+            player.setCardCzar(false);
+            while (player.getCardsOnHands().size()<10){
+                List<Card> cards = player.getCardsOnHands();
+                List<Card> remainingWhiteCards = cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(), true, false);
+                int upperbound=remainingWhiteCards.size();
+                int int_random = rand.nextInt(upperbound);
+                cards.add(remainingWhiteCards.get(int_random));
+                remainingWhiteCards.get(int_random).setPlayed(true);
+                player.setCardsOnHands(cards);
+                cardRepository.saveAndFlush(remainingWhiteCards.get(int_random));
+            }
+            playerRepository.saveAndFlush(player);
+        }
         GameRound currentGameRound=createNewRound(game);
-        long nextCardCzarId=computeCardCzarId(game);
+        Long nextCardCzarId=computeCardCzarId(game);
         Player currentCardCzar=playerRepository.findByPlayerId(nextCardCzarId);
         currentCardCzar.setCardCzar(true);
         currentGameRound.setCardCzarId(currentCardCzar.getPlayerId());
@@ -79,7 +95,7 @@ public class GameRoundService {
 
         return currentGameRound;
     }
-    private long computeCardCzarId(Game game){
+    private Long computeCardCzarId(Game game){
         int numberOfPlayers=game.getNumOfPlayersJoined();
         int currentGameRoundIndex=game.getCurrentGameRoundIndex();
         int nextCardCzarPos=(currentGameRoundIndex-1)%4;

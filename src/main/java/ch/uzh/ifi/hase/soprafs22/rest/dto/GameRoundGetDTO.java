@@ -14,6 +14,6 @@ import java.util.Map;
 public class GameRoundGetDTO {
     private Long roundId;
     private Card blackCard;
-    private long cardCzarId;
+    private Long cardCzarId;
 
 }
