@@ -116,14 +116,15 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
     }
 
-    @PutMapping("/games/waitingArea/{gameId}")
+    @PutMapping("/leave/{gameId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void leaveWaitingArea(@RequestHeader("Authorization") String token,
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
-        gameService.leaveWaitingArea(gameId, token);
+        gameService.leaveGame(gameId, token);
     }
+
 
     /*
      TODO: create an endpoint for the /gameRound which will be used to

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -15,6 +14,6 @@ import java.util.Map;
 public class GameRoundGetDTO {
     private Long roundId;
     private Card blackCard;
-    private long cardCzarId;
-    private List<Card> playedCards;
+    private Long cardCzarId;
+
 }

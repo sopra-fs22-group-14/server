@@ -206,7 +206,7 @@ public class GameControllerTest {
         given(gameService.getGame(1L)).willReturn(testGame);
         given(playerRepository.findByPlayerId(3L)).willReturn(testPlayer);
 
-        doNothing().when(gameService).leaveWaitingArea(anyLong(),Mockito.anyString());
+        doNothing().when(gameService).leaveGame(anyLong(),Mockito.anyString());
         GamePutDTO gamePutDTO = new GamePutDTO();
         gamePutDTO.setGameId(1L);
 
