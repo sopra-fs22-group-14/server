@@ -18,7 +18,12 @@ import java.io.Serializable;
 public class Card implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "card_id_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "card_id_seq",
+            sequenceName = "card_id_seq",
+            allocationSize = 50
+    )
     private Long cardId;
 
     @Column
