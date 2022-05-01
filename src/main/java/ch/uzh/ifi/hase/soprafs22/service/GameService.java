@@ -54,8 +54,15 @@ public class GameService {
         this.deckRepository = deckRepository;
     }
 
-    public List<Game> getAllGames(){
-        return this.gameRepository.findAll();
+    public List<Game> joinableGames(){
+        List<Game> joinableGames = new ArrayList<>();
+        List<Game> allGames=gameRepository.findAll();
+        for (Game game: allGames){
+            if(game.getNumOfPlayersJoined()<4) {
+                joinableGames.add(game);
+            }
+        }
+        return joinableGames;
     }
 
     // get a single game with a given Id
@@ -74,7 +81,6 @@ public class GameService {
         if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Player already joined another game.");
         }
-
         Game game = new Game();
         game.setGameName(gameInput.getGameName());
         game.setCardCzarMode(gameInput.isCardCzarMode());
@@ -86,11 +92,9 @@ public class GameService {
         Player adminPlayer = createPlayer(token);
         addPlayerToGame(adminPlayer,game);
 
-
         Deck d=createDeck(game.getGameEdition());
         game.setDeckID(d.getDeckId());
         game = gameRepository.saveAndFlush(game);
-
 
         return game;
     }
@@ -205,14 +209,10 @@ public class GameService {
                currentCard.setPlayed(true);
                cardRepository.saveAndFlush(currentCard);
                card_Index++;
-
            }
-
            playerRepository.saveAndFlush(currentPlayer);
        }
-
         GameRound currentGameRound=gameRoundService.startNewRound(game);
-
         return;
     }
 

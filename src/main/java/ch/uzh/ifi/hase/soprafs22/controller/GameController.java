@@ -29,11 +29,11 @@ public class GameController {
     @GetMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<GameGetDTO> getAllGames(@RequestHeader("Authorization") String token) {
+    public List<GameGetDTO> joinableGames(@RequestHeader("Authorization") String token) {
 
         // GET TOKEN FROM HEADER CHECK IF AUTHORIZED etc..
         userService.checkIfAuthorized(token);
-        List<Game> games = gameService.getAllGames();
+        List<Game> games = gameService.joinableGames();
         List<GameGetDTO> gameGetDTOs = new ArrayList<>();
 
         // convert each game to the API representation

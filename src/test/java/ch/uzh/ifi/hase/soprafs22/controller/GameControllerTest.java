@@ -70,15 +70,15 @@ public class GameControllerTest {
 
 
     @Test
-    void givenGames_whenGetGames_thenReturnJsonArray() throws Exception {        //  --------------------------------------------------->   GET "/users" test
+    void givenGames_whenGetJoinableGames_thenReturnJsonArray() throws Exception {        //  --------------------------------------------------->   GET "/users" test
         // given
         Game testGame=new Game();
         testGame.setGameId(1l);
         testGame.setGameName("abc");
         testGame.setNumOfPlayersJoined(1);
-        List<Game> allGames = Collections.singletonList(testGame);
+        List<Game> joinableGames = Collections.singletonList(testGame);
 
-        given(gameService.getAllGames()).willReturn(allGames);
+        given(gameService.joinableGames()).willReturn(joinableGames);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/games").contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
