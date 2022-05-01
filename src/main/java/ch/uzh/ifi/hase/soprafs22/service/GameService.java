@@ -227,7 +227,7 @@ public class GameService {
         return requestedGame;
     }
 
-    // method if a player decides to leave the waitingArea
+    // method if a player decides to leave the game
     public void leaveGame(Long gameId, String token) {
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
@@ -235,11 +235,11 @@ public class GameService {
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
             return; // if it does not contain then return
 
-        // if contains more than one player then just remove the player
-        if (gameToLeave.getNumOfPlayersJoined() > 1) {
-            removePlayerFromGame(gameToLeave, userToRemove);
-        } else {
-            // if there is only one player left, delete the game
+        boolean lastPlayer = gameToLeave.getNumOfPlayersJoined() == 1;
+        // remove the player
+        removePlayerFromGame(gameToLeave, userToRemove);
+        // if it is the last player, also delete the game
+        if (lastPlayer) {
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
         }
