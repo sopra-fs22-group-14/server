@@ -240,6 +240,7 @@ public class GameService {
         removePlayerFromGame(gameToLeave, userToRemove);
         // if it is the last player, also delete the game
         if (lastPlayer) {
+            //TODO delete gameRound?
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
         }
@@ -364,6 +365,7 @@ public class GameService {
         game.setLatestRoundWinner(roundWinner);
         game.setLatestWinningCardText(winningCard.getCardText());
     }
+
 
 
 }

@@ -45,18 +45,18 @@ public class User implements Serializable {
     private String token;
 
     @Column(nullable = false)
-    private UserStatus status; //logged_in --> ENUMS yes/no to be decided
+    private UserStatus status;
 
     @Column(nullable = false)
     private String password;
-
-    @Column(nullable = false)
-    private int totalGamePlayed;
 
     @CreationTimestamp
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date creationDate;
+
+    @Column(nullable = false)
+    private int totalGamePlayed;
 
     @Column(nullable = false)
     private int totalGameWon;
@@ -70,4 +70,8 @@ public class User implements Serializable {
     @Column(nullable = false)
     @ElementCollection
     private List<String> bestCombinations=new ArrayList<>();
+
+
+
+
 }
