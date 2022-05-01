@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,4 +23,6 @@ public class GameGetDTO {
     private int numOfRounds;
     private String latestRoundWinner;
     private String latestWinningCardText;
+    private List<String> playerNames;
+    private int currentGameRoundIndex;
 }

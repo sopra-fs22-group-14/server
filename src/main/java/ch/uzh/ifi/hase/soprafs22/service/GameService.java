@@ -38,6 +38,7 @@ public class GameService {
     private final GameRoundService gameRoundService;
     private final CardRepository cardRepository;
 
+
     private final DeckRepository deckRepository;
 
     //TODO I am not sure that we need autowired here. But probably we need since we have multiple repos
@@ -83,7 +84,6 @@ public class GameService {
         game.setGameEdition(gameInput.getGameEdition());
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(token);
-
         addPlayerToGame(adminPlayer,game);
 
 
@@ -125,6 +125,9 @@ public class GameService {
             List<Long> players = game.getPlayerIds();
             players.add(playerToAdd.getPlayerId());
             game.setPlayerIds(players);
+            List<String> currentPlayerNames=game.getPlayerNames();
+            currentPlayerNames.add(playerToAdd.getPlayerName());
+            game.setPlayerNames(currentPlayerNames);
             game.setNumOfPlayersJoined(game.getPlayerIds().size());}
 
         else{
@@ -139,7 +142,10 @@ public class GameService {
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
+                List<String> currentPlayerNames=gameToLeave.getPlayerNames();
                 Player playerToDelete=playerRepository.findByPlayerId(playerId);
+                currentPlayerNames.remove(playerToDelete.getPlayerName());
+                gameToLeave.setPlayerNames(currentPlayerNames);
                 playerRepository.delete(playerToDelete);
                 playerRepository.flush();
                 gameToLeave.decreasePlayers();

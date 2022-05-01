@@ -55,6 +55,8 @@ public interface DTOMapper {
     @Mapping(source = "numOfRounds", target = "numOfRounds")
     @Mapping(source = "latestRoundWinner", target = "latestRoundWinner")
     @Mapping(source = "latestWinningCardText", target = "latestWinningCardText")
+    @Mapping(source = "playerNames", target = "playerNames")
+    @Mapping(source = "currentGameRoundIndex", target = "currentGameRoundIndex")
     GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "gameName", target = "gameName")

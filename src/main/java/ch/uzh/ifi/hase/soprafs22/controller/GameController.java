@@ -70,6 +70,10 @@ public class GameController {
     public GameGetDTO getGame(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
         userService.checkIfAuthorized(token);
         Game requestedGame = gameService.getGame(gameId);
+        User userByToken=userService.getUser(token);
+        List<String> currentPlayerNames=requestedGame.getPlayerNames();
+        currentPlayerNames.remove(userByToken.getUsername());
+        requestedGame.setPlayerNames(currentPlayerNames);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
     }
 

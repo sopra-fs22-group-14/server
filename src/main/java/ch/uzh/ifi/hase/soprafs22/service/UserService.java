@@ -55,6 +55,14 @@ public class UserService {
     return this.userRepository.findAll();
     }
 
+    public User getUser(String token){
+        User userByToken=userRepository.findByToken(token);
+        if(userByToken==null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist!");
+        }
+        return userByToken;
+    }
+
 
     /** PRODUCTION READY*/
     /** SZYMON */

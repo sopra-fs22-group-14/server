@@ -78,6 +78,10 @@ public class Game implements Serializable{
     @ElementCollection
     private List<Long> roundIds = new ArrayList<>();
 
+    @Column
+    @ElementCollection
+    private List<String> playerNames=new ArrayList<>();
+
 
     //@Column(nullable = false)
     //@ElementCollection
