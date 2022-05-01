@@ -69,9 +69,9 @@ public class GameRepositoryIntegrationTest {
         assertEquals(found.getRoundIds(), game.getRoundIds());
         assertEquals(found.getPlayerIds(), game.getPlayerIds());
         assertEquals(found.getNumOfPlayersJoined(), game.getNumOfPlayersJoined());
-
-
     }
+
+
     @Test
     void findGame_byGameName_success(){
         Game game=new Game();
