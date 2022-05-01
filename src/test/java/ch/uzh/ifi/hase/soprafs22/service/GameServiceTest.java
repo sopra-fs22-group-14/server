@@ -266,6 +266,7 @@ public class GameServiceTest {
     }
     @Test
     public void updateLatestRoundWinner_success(){
+        
         Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
         Mockito.when(gameRepository.findByGameId(testRound.getCorrespondingGameId())).thenReturn(testGame);
         Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(testCard);
