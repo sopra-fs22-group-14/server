@@ -177,6 +177,10 @@ public class GameRoundService {
         Long currentRoundWinnerId=currentGameRound.getCardAndPlayerIds().get(cardId);
         currentGameRound.setRoundWinnerId(currentRoundWinnerId);
         Player currentWinner=playerRepository.findByPlayerId(currentRoundWinnerId);
+        int currentNumberOfPicked=currentWinner.getNumberOfPicked();
+        currentWinner.setNumberOfPicked(currentNumberOfPicked+1);
+        playerRepository.save(currentWinner);
+        playerRepository.flush();
         String currentRoundWinnerName=currentWinner.getPlayerName();
         currentGameRound.setRoundWinnerName(currentRoundWinnerName);
         gameRoundRepository.saveAndFlush(currentGameRound);
