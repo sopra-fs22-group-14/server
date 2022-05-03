@@ -127,6 +127,7 @@ public class GameController {
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
         gameService.leaveGame(gameId, token);
+
     }
 
 

@@ -35,6 +35,9 @@ public class Player implements Serializable {
     @Column
     private int roundsWon;
 
+    @Column
+    private int numberOfPicked;
+
     //TODO just store Id's or the object's
     @Column
     @OneToMany
