@@ -247,6 +247,7 @@ public class GameService {
         removePlayerFromGame(gameToLeave, userToRemove);
         // if it is the last player, also delete the game
         if (lastPlayer) {
+            //TODO delete gameRound?
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
         }
@@ -287,8 +288,8 @@ public class GameService {
             pathWhite = "src/main/resources/CAH Base Set White.csv";
         }
         else {
-            pathBlack = "src/main/resources/CAH Base Set White.csv";
-            pathWhite = "src/main/resources/CAH Base Set White.csv";
+            pathBlack = "src/main/resources/CAH Family Edition Black.csv";
+            pathWhite = "src/main/resources/CAH Family Edition White.csv";
         }
         try (BufferedReader br = new BufferedReader(new FileReader(pathBlack))) {
             String line;
@@ -360,6 +361,8 @@ public class GameService {
        return gameRoundToGet;
 
     }
+
+
 
 
 
