@@ -66,7 +66,7 @@ public class GameRoundService {
         return gameRound;
     }
 
-    //TODO how to change old cardCzarsStatus
+
     public GameRound startNewRound(Game game){
         List<Long> players = game.getPlayerIds();
         for(Long playerId: players){
@@ -85,11 +85,14 @@ public class GameRoundService {
             playerRepository.saveAndFlush(player);
         }
         GameRound currentGameRound=createNewRound(game);
-        Long nextCardCzarId=computeCardCzarId(game);
-        Player currentCardCzar=playerRepository.findByPlayerId(nextCardCzarId);
-        currentCardCzar.setCardCzar(true);
-        currentGameRound.setCardCzarId(currentCardCzar.getPlayerId());
-        playerRepository.saveAndFlush(currentCardCzar);
+        if(game.isCardCzarMode()) {  //we don't need to compute card Czar Id if it is not cardCzarmode
+            Long nextCardCzarId = computeCardCzarId(game);
+            Player currentCardCzar = playerRepository.findByPlayerId(nextCardCzarId);
+            currentCardCzar.setCardCzar(true);
+            currentGameRound.setCardCzarId(currentCardCzar.getPlayerId());
+            playerRepository.saveAndFlush(currentCardCzar);
+        }
+        currentGameRound.setNumberOfPicked(0);
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
 
@@ -102,13 +105,21 @@ public class GameRoundService {
         return game.getPlayerIds().get(nextCardCzarPos);
 
     }
-    public GameRound playCard(Long gameRoundId,String token,Long cardId){
+    public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId){
         User userByToken=userRepository.findByToken(token);
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
+        Game currentGame=gameRepository.findByGameId(gameId);
+        Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
+        if(currentGame.isCardCzarMode()&& currentPlayer.isCardCzar()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "card czar can not play a card!");
+        }
+
         if(currentGameRound.getCardAndPlayerIds().containsValue(userByToken.getUserId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "player already played a card!");
         }
-        Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
+
+
+
         List<Card>currentCardsOnHand=currentPlayer.getCardsOnHands();
         Card playedCard=cardRepository.findByCardId(cardId);
         if(!currentCardsOnHand.contains(playedCard)){
@@ -129,7 +140,34 @@ public class GameRoundService {
         return currentGameRound;
 
     }
+
+
+    public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
+        Game requestedGame=gameRepository.findByGameId(gameId);
+        if(requestedGame.isCardCzarMode()){
+            String roundWinner=chooseRoundWinner(gameRoundId, token,cardId);
+            updateLatestRoundWinner(roundWinner,gameRoundId,cardId);
+        }
+        else{
+            //if it is not cardCzar mode everybody can pick a card
+            pickCard(gameRoundId,token,cardId);
+        }
+    }
+    // updates the round winner name and the round winning card text in the game
+    public void updateLatestRoundWinner(String roundWinner, Long gameRoundId, Long cardId) {
+        // first, get the corresponding game from the gameRoundId
+        GameRound gameRound = gameRoundRepository.findByRoundId(gameRoundId);
+        Game game = gameRepository.findByGameId(gameRound.getCorrespondingGameId());
+        Card winningCard = cardRepository.findByCardId(cardId);
+
+        // set the two values used for the displaying of the winner
+        game.setLatestRoundWinner(roundWinner);
+        game.setLatestWinningCardText(winningCard.getCardText());
+        gameRepository.save(game);
+        gameRepository.flush();
+    }
     public String chooseRoundWinner(Long gameRoundId,String token,Long cardId){
+
         User userByToken=userRepository.findByToken(token);
         Player currentPlayer=playerRepository.findByPlayerId(userByToken.getUserId());
         if(!currentPlayer.isCardCzar()){
@@ -139,6 +177,10 @@ public class GameRoundService {
         Long currentRoundWinnerId=currentGameRound.getCardAndPlayerIds().get(cardId);
         currentGameRound.setRoundWinnerId(currentRoundWinnerId);
         Player currentWinner=playerRepository.findByPlayerId(currentRoundWinnerId);
+        int currentNumberOfPicked=currentWinner.getNumberOfPicked();
+        currentWinner.setNumberOfPicked(currentNumberOfPicked+1);
+        playerRepository.save(currentWinner);
+        playerRepository.flush();
         String currentRoundWinnerName=currentWinner.getPlayerName();
         currentGameRound.setRoundWinnerName(currentRoundWinnerName);
         gameRoundRepository.saveAndFlush(currentGameRound);
@@ -149,6 +191,26 @@ public class GameRoundService {
 
         // and return the old round winner
         return currentRoundWinnerName;
+    }
+    public void pickCard(Long gameRoundId,String token,Long cardId){
+        //User userByToken=userRepository.findByToken(token);
+        //TODO check if he picked before
+        GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
+        Long currentPickedId=currentGameRound.getCardAndPlayerIds().get(cardId);
+        Player currentPlayer=playerRepository.findByPlayerId(currentPickedId);
+        int currentNumberOfPicked=currentPlayer.getNumberOfPicked();
+        currentPlayer.setNumberOfPicked(currentNumberOfPicked+1);
+        playerRepository.save(currentPlayer);
+        playerRepository.flush();
+        int gameRoundNumberOfPicked=currentGameRound.getNumberOfPicked(); //how many players has played so far
+        currentGameRound.setNumberOfPicked(gameRoundNumberOfPicked+1); //increase number of players ehich played by 1
+        currentGameRound=gameRoundRepository.save(currentGameRound);
+        gameRoundRepository.flush();
+        if(currentGameRound.getNumberOfPicked()==4){
+            //if 4 player has picked a card then start a new round
+            Game currentGame = gameRepository.findByGameId(currentGameRound.getCorrespondingGameId());
+            startNewRound(currentGame);
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.entity.Card;
+import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.GameRound;
 import ch.uzh.ifi.hase.soprafs22.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
@@ -36,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,6 +63,14 @@ public class GameRoundControllerTest {
 
     @Test
     public void chooseRoundWinner() throws Exception{
+        Game testGame=new Game();
+        testGame.setGameId(1L);
+        testGame.setGameName("abc");
+        //testGame.setNumOfPlayersJoined(1);
+        testGame.setCardCzarMode(true);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+
         GameRound gameRound=new GameRound();
 
         gameRound.setRoundId(1L);
@@ -111,7 +120,9 @@ public class GameRoundControllerTest {
         testCardAndPlayerIds.put(4L,7L);
         testCardAndPlayerIds.put(5L,8L);
         gameRound.setCardAndPlayerIds(testCardAndPlayerIds);
-        given(gameRoundService.chooseRoundWinner(anyLong(),Mockito.anyString(),anyLong())).willReturn("testPlayer");
+
+
+       doNothing().when(gameRoundService).pickWinner(anyLong(),anyLong(),Mockito.anyString(),anyLong());
         GameRoundPostDTO gameRoundPostDTO = new GameRoundPostDTO();
         gameRoundPostDTO.setCardId(3L);
         MockHttpServletRequestBuilder postRequest = post(String.format("/%s/roundWinner", gameRound.getRoundId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken").content(asJsonString(gameRoundPostDTO));
@@ -158,7 +169,7 @@ public class GameRoundControllerTest {
         testCardAndPlayerIds.put(3L,6L);
         testCardAndPlayerIds.put(4L,7L);
         gameRound.setCardAndPlayerIds(testCardAndPlayerIds);
-        given(gameRoundService.playCard(anyLong(),Mockito.anyString(),anyLong())).willReturn(gameRound);
+        given(gameRoundService.playCard(anyLong(),Mockito.anyString(),anyLong(),anyLong())).willReturn(gameRound);
         GameRoundPostDTO gameRoundPostDTO = new GameRoundPostDTO();
         gameRoundPostDTO.setCardId(4L);
         MockHttpServletRequestBuilder postRequest = post(String.format("/%s/white", gameRound.getRoundId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken").content(asJsonString(gameRoundPostDTO));

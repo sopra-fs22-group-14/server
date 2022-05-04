@@ -64,6 +64,13 @@ public class GameService {
         }
         return joinableGames;
     }
+    public void isInGame(String token,Long gameId){
+        Game currentGame=gameRepository.findByGameId(gameId);
+        User userByToken=userRepository.findByToken(token);
+        if(!currentGame.getPlayerIds().contains(userByToken.getUserId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "player is not in this game!");
+        }
+    }
 
     // get a single game with a given Id
     public Game getGame(Long gameId) {
@@ -257,6 +264,7 @@ public class GameService {
         player.setPlaying(true);
         player.setCardCzar(false);
         player.setRoundsWon(0);
+        player.setNumberOfPicked(0);
         player = playerRepository.saveAndFlush(player);
         return player;
     }
@@ -354,17 +362,7 @@ public class GameService {
 
     }
 
-    // updates the round winner name and the round winning card text in the game
-    public void updateLatestRoundWinner(String roundWinner, Long gameRoundId, Long cardId) {
-        // first, get the corresponding game from the gameRoundId
-        GameRound gameRound = gameRoundRepository.findByRoundId(gameRoundId);
-        Game game = gameRepository.findByGameId(gameRound.getCorrespondingGameId());
-        Card winningCard = cardRepository.findByCardId(cardId);
 
-        // set the two values used for the displaying of the winner
-        game.setLatestRoundWinner(roundWinner);
-        game.setLatestWinningCardText(winningCard.getCardText());
-    }
 
 
 

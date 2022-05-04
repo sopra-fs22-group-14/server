@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
+import ch.uzh.ifi.hase.soprafs22.entity.Game;
 import ch.uzh.ifi.hase.soprafs22.entity.GameRound;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameRoundGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.GameRoundPostDTO;
@@ -28,7 +29,8 @@ public class GameRoundController {
     @ResponseBody
     public GameRoundGetDTO playWhiteCard(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
-        GameRound requestedGameRound=gameRoundService.playCard(gameRoundId,token,gameRoundPostDTO.getCardId());
+        gameService.isInGame(token,gameRoundPostDTO.getGameId());
+        GameRound requestedGameRound=gameRoundService.playCard(gameRoundId,token,gameRoundPostDTO.getCardId(),gameRoundPostDTO.getGameId());
         return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
     }
 
@@ -37,8 +39,8 @@ public class GameRoundController {
     @ResponseBody
     public void chooseRoundWinner(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
-        String roundWinner = gameRoundService.chooseRoundWinner(gameRoundId,token,gameRoundPostDTO.getCardId());
-        gameService.updateLatestRoundWinner(roundWinner, gameRoundId, gameRoundPostDTO.getCardId());
+        gameService.isInGame(token,gameRoundPostDTO.getGameId());
+        gameRoundService.pickWinner(gameRoundPostDTO.getGameId(),gameRoundId,token,gameRoundPostDTO.getCardId());
     }
 
 

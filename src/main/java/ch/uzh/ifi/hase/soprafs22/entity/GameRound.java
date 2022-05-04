@@ -55,6 +55,9 @@ public class GameRound {
     @Column
     private Long roundWinnerId;
 
+    @Column
+    private int numberOfPicked;
+
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection
