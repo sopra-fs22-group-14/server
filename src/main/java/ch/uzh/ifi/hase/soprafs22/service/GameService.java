@@ -58,7 +58,7 @@ public class GameService {
         List<Game> joinableGames = new ArrayList<>();
         List<Game> allGames=gameRepository.findAll();
         for (Game game: allGames){
-            if(game.getNumOfPlayersJoined()<4 && !game.isActive()) {
+            if(game.getNumOfPlayersJoined()<4 && !game.isActive()) { // && !game.isActive()
                 joinableGames.add(game);
             }
         }
@@ -175,7 +175,8 @@ public class GameService {
                 gameRepository.saveAndFlush(game);
                 // if the lobby is full, start the game
                 if (game.getNumOfPlayersJoined() == 4)
-                    game.setActive(true);
+                    //game.setActive(true);
+                    //game=gameRepository.saveAndFlush(game);
                     this.startGame(game);
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
@@ -209,6 +210,7 @@ public class GameService {
        for(Long playerId: game.getPlayerIds()){
            Player currentPlayer=playerRepository.findByPlayerId(playerId);
            for(int i=0; i<10; i++){
+               //System.out.println("test");
                Card currentCard=whiteCards.get(arr[card_Index]);
                List <Card>playerCards=currentPlayer.getCardsOnHands();
                playerCards.add(currentCard);
