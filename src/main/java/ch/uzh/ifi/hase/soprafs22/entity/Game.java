@@ -36,6 +36,9 @@ public class Game implements Serializable{
     private String gameEdition;
 
     @Column
+    private boolean isActive;
+
+    @Column
     private int numOfPlayersJoined;
 
     @Column
@@ -74,6 +77,7 @@ public class Game implements Serializable{
     //TODO this also works decide which one to use
     //@OneToMany
     //private List<Player> playerList = new ArrayList<>();
+
     @Column
     @ElementCollection
     private List<Long> roundIds = new ArrayList<>();
@@ -81,6 +85,18 @@ public class Game implements Serializable{
     @Column
     @ElementCollection
     private List<String> playerNames=new ArrayList<>();
+
+    @Column
+    @ElementCollection
+    private List<Integer> playersNumbersOfPicked=new ArrayList<>();
+
+    @Column
+    @ElementCollection
+    private List<String> winnersNames=new ArrayList<>();
+
+    @Column
+    @ElementCollection
+    private List<Long> winnersIds=new ArrayList<>();
 
 
     //@Column(nullable = false)

@@ -82,4 +82,11 @@ public interface DTOMapper {
     @Mapping(source = "playedCards", target = "playedCards")
     GameRoundGetDTO convertEntityToGameRoundGetDTO(GameRound gameRound);
 
+    @Mapping(source = "playerNames", target = "playersNames") //change of an "s" player(s)Names for Szymon/Frontend
+    @Mapping(source = "playersNumbersOfPicked", target = "playersNumbersOfPicked")
+    @Mapping(source = "winnersNames", target = "winnersNames")
+    @Mapping(source = "winnersIds", target = "winnersIds")
+    GameSummaryGetDTO convertEntityToGameSummaryGetDTO(Game game);
+
+
 }
