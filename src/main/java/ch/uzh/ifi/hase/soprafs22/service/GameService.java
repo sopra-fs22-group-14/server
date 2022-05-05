@@ -385,6 +385,11 @@ public class GameService {
                 winnersNames.add(player.getPlayerName());
             }
         }
+        game.setPlayerIds(playerIds);
+        game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
+        game.setWinnersIds(winnersIds);
+        game.setWinnersNames(winnersNames);
+
         return game;
     }
 
