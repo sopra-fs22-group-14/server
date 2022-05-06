@@ -58,6 +58,9 @@ public class GameRound {
     @Column
     private int numberOfPicked;
 
+    @Column
+    private boolean isFinal;
+
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection

@@ -175,10 +175,13 @@ public class GameService {
                 addPlayerToGame(player, game);
                 gameRepository.saveAndFlush(game);
                 // if the lobby is full, start the game
-                if (game.getNumOfPlayersJoined() == 4)
-                    //game.setActive(true);
+                if (game.getNumOfPlayersJoined() == 4) {
+                    game.setActive(true);
                     //game=gameRepository.saveAndFlush(game);
                     this.startGame(game);
+
+                    //game.setActive(true);
+                }
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }

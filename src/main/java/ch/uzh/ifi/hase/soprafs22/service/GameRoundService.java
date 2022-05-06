@@ -93,6 +93,10 @@ public class GameRoundService {
             playerRepository.saveAndFlush(currentCardCzar);
         }
         currentGameRound.setNumberOfPicked(0);
+        currentGameRound.setFinal(false);
+        if(game.getRoundIds().size()==game.getNumOfRounds()){
+            currentGameRound.setFinal(true);
+        }
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
 
@@ -186,7 +190,9 @@ public class GameRoundService {
 
         // after everything is done, start a new game round
         Game currentGame = gameRepository.findByGameId(currentGameRound.getCorrespondingGameId());
-        startNewRound(currentGame);
+        if(!currentGameRound.isFinal()) {
+            startNewRound(currentGame); //if it is last round don't start a new round
+        }
 
         // and return the old round winner
         return currentRoundWinnerName;
@@ -213,7 +219,9 @@ public class GameRoundService {
             currentGame.setLatestWinningCardText(currentGameRound.getRoundId()+"");
             gameRepository.save(currentGame);
             gameRepository.flush();
-            startNewRound(currentGame);
+            if(!currentGameRound.isFinal()) { //if it is final round don't start a new round
+                startNewRound(currentGame);
+            }
         }
     }
 
