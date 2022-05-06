@@ -389,7 +389,6 @@ public class GameService {
         game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
         game.setWinnersIds(winnersIds);
         game.setWinnersNames(winnersNames);
-
         return game;
     }
 
