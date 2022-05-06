@@ -58,7 +58,7 @@ public class GameService {
         List<Game> joinableGames = new ArrayList<>();
         List<Game> allGames=gameRepository.findAll();
         for (Game game: allGames){
-            if(game.getNumOfPlayersJoined()<4) {
+            if(game.getNumOfPlayersJoined()<4 && !game.isActive()) { // && !game.isActive()
                 joinableGames.add(game);
             }
         }
@@ -95,6 +95,7 @@ public class GameService {
         game.setCurrentGameRoundIndex(0);
         game.setNumOfRounds(gameInput.getNumOfRounds());
         game.setGameEdition(gameInput.getGameEdition());
+        game.setActive(false);
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(token);
         addPlayerToGame(adminPlayer,game);
@@ -146,8 +147,6 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
 
-
-
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
         // TODO delete player object for corresponding user?
         // TODO delete player completely
@@ -177,6 +176,8 @@ public class GameService {
                 gameRepository.saveAndFlush(game);
                 // if the lobby is full, start the game
                 if (game.getNumOfPlayersJoined() == 4)
+                    //game.setActive(true);
+                    //game=gameRepository.saveAndFlush(game);
                     this.startGame(game);
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
@@ -210,6 +211,7 @@ public class GameService {
        for(Long playerId: game.getPlayerIds()){
            Player currentPlayer=playerRepository.findByPlayerId(playerId);
            for(int i=0; i<10; i++){
+               //System.out.println("test");
                Card currentCard=whiteCards.get(arr[card_Index]);
                List <Card>playerCards=currentPlayer.getCardsOnHands();
                playerCards.add(currentCard);
@@ -221,7 +223,8 @@ public class GameService {
            playerRepository.saveAndFlush(currentPlayer);
        }
         GameRound currentGameRound=gameRoundService.startNewRound(game);
-        return;
+
+       return;
     }
 
     // method to update player count in the waiting area
@@ -295,7 +298,7 @@ public class GameService {
         try (BufferedReader br = new BufferedReader(new FileReader(pathBlack))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Card c = new Card();
+                Card c = new Card();//line, true, gameEdition, false
                 c.setCardText(line);
                 c.setWhite(false);
                 c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
@@ -311,7 +314,7 @@ public class GameService {
         try (BufferedReader br = new BufferedReader(new FileReader(pathWhite))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Card c = new Card();
+                Card c = new Card(); //line, true, gameEdition, false
                 c.setCardText(line);
                 c.setWhite(true);
                 c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
@@ -327,7 +330,6 @@ public class GameService {
 
         //test printing out all the Cards on Console
         cards=cardRepository.saveAll(cards);
-
         cardRepository.flush();
         //d.setCards(cards);
         d=deckRepository.save(d);
@@ -361,6 +363,35 @@ public class GameService {
        GameRound gameRoundToGet=gameRoundRepository.findByRoundId(gameById.getCurrentGameRoundId());
        return gameRoundToGet;
 
+    }
+
+    public Game getGameSummaryAndWinner(Long gameId){
+        Game game=gameRepository.findByGameId(gameId);
+        List<Long> playerIds = game.getPlayerIds();
+        int MaxAmountOfWins = 0;
+        List<Long> winnersIds = new ArrayList<>();
+        List<String> winnersNames = new ArrayList<>();
+        List<Integer> playersNumbersOfPicked = new ArrayList<>();
+        for(Long playerId : playerIds){
+            Player player = playerRepository.findByPlayerId(playerId);
+            playersNumbersOfPicked.add(player.getNumberOfPicked());
+            if(player.getNumberOfPicked()>MaxAmountOfWins){
+                MaxAmountOfWins = player.getNumberOfPicked();
+            }
+        }
+        for(Long playerId: playerIds){
+            Player player = playerRepository.findByPlayerId(playerId);
+            if(player.getNumberOfPicked()==MaxAmountOfWins){
+                winnersIds.add(playerId);
+                winnersNames.add(player.getPlayerName());
+            }
+        }
+        game.setPlayerIds(playerIds);
+        game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
+        game.setWinnersIds(winnersIds);
+        game.setWinnersNames(winnersNames);
+
+        return game;
     }
 
 

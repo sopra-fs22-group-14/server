@@ -120,6 +120,16 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
     }
 
+    @GetMapping("/{gameId}/gameEnd")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameSummaryGetDTO getGameSummaryAndWinner(@RequestHeader("Authorization") String token,
+                                        @PathVariable Long gameId) {
+        userService.checkIfAuthorized(token);
+        Game requestedGame = gameService.getGameSummaryAndWinner(gameId);
+        return DTOMapper.INSTANCE.convertEntityToGameSummaryGetDTO(requestedGame);
+    }
+
     @PutMapping("/leave/{gameId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

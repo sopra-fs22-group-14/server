@@ -71,7 +71,12 @@ public class User implements Serializable {
     @ElementCollection
     private List<String> bestCombinations=new ArrayList<>();
 
-
+    public void increaseCounter(int amountOfGameWon, int amountOfRoundsPlayed, int amountOfRoundsWon){
+        this.totalGamePlayed++;
+        this.totalGameWon += amountOfGameWon;
+        this.totalRoundPlayed += amountOfRoundsPlayed;
+        this.totalRoundWon += amountOfRoundsWon;
+    }
 
 
 }
