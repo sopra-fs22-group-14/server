@@ -139,7 +139,8 @@ public class GameService {
             List<String> currentPlayerNames=game.getPlayerNames();
             currentPlayerNames.add(playerToAdd.getPlayerName());
             game.setPlayerNames(currentPlayerNames);
-            game.setNumOfPlayersJoined(game.getPlayerIds().size());}
+            game.setNumOfPlayersJoined(game.getPlayerIds().size());
+        }
 
         else{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
