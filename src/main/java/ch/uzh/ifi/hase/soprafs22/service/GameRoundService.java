@@ -144,11 +144,10 @@ public class GameRoundService {
 
     public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
         Game requestedGame=gameRepository.findByGameId(gameId);
-        if(requestedGame.isCardCzarMode()){
-            String roundWinner=chooseRoundWinner(gameRoundId, token,cardId);
-            updateLatestRoundWinner(roundWinner,gameRoundId,cardId);
-        }
-        else{
+        if (requestedGame.isCardCzarMode()) {
+            String roundWinner = chooseRoundWinner(gameRoundId, token, cardId);
+            updateLatestRoundWinner(roundWinner, gameRoundId, cardId);
+        } else {
             //if it is not cardCzar mode everybody can pick a card
             pickCard(gameRoundId,token,cardId);
         }
@@ -192,6 +191,7 @@ public class GameRoundService {
         // and return the old round winner
         return currentRoundWinnerName;
     }
+
     public void pickCard(Long gameRoundId,String token,Long cardId){
         //User userByToken=userRepository.findByToken(token);
         //TODO check if he picked before
@@ -206,14 +206,16 @@ public class GameRoundService {
         currentGameRound.setNumberOfPicked(gameRoundNumberOfPicked+1); //increase number of players ehich played by 1
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
-        if(currentGameRound.getNumberOfPicked()==4){
+        if(currentGameRound.getNumberOfPicked()==4) {
             //if 4 player has picked a card then start a new round
             Game currentGame = gameRepository.findByGameId(currentGameRound.getCorrespondingGameId());
+            // DIEGO: set latestWinningCardText for frontend detection of game ending
+            currentGame.setLatestWinningCardText(currentGameRound.getRoundId()+"");
+            gameRepository.save(currentGame);
+            gameRepository.flush();
             startNewRound(currentGame);
         }
     }
-
-
 
     public List<GameRound> getAllGameRounds(){
         return this.gameRoundRepository.findAll();
