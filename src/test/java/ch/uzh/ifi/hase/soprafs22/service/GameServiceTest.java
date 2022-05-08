@@ -264,15 +264,7 @@ public class GameServiceTest {
         GameRound foundGameRound=gameService.getGameRound(testGame.getGameId());
         assertEquals(foundGameRound.getRoundId(),testRound.getRoundId());
     }
-    /*@Test
-    public void updateLatestRoundWinner_success(){
-        
-        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
-        Mockito.when(gameRepository.findByGameId(testRound.getCorrespondingGameId())).thenReturn(testGame);
-        Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(testCard);
-        gameService.updateLatestRoundWinner("testWinner",testRound.getRoundId(),testCard.getCardId());
 
-    } */ //TODO move it to gameroundservice test
 
 
 
