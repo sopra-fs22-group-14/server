@@ -38,7 +38,6 @@ public class Player implements Serializable {
     @Column
     private int numberOfPicked;
 
-    //TODO just store Id's or the object's
     @Column
     @OneToMany
     private List<Card> cardsOnHands=new ArrayList<>();

@@ -43,7 +43,6 @@ public class GameRoundService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game has finished! No more gameRounds.");
         }
         GameRound gameRound=new GameRound();
-        //TODO how to select blackcard from repository and store cardCzar id
         Deck d=deckRepository.findByDeckId(game.getDeckID());
         List <Card> blackCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),false,false);
         int upperbound = blackCards.size();

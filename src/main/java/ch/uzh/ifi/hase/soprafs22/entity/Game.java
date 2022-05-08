@@ -64,9 +64,6 @@ public class Game implements Serializable{
     @Column
     private Long deckID;
 
-    //TODO we might need a gamestatus
-
-    //TODO just store Id's or the object's
     //@Column(nullable = false, unique=true)
     //@ElementCollection
     //private List<Player> playerList = new ArrayList<>;

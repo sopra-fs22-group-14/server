@@ -24,7 +24,6 @@ public class Deck {
     @Column
     private String deckName;
 
-    //TODO just store Id's or the object's
     @Column
     //@ElementCollection
     @OneToMany

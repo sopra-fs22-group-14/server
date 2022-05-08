@@ -11,4 +11,6 @@ public interface CardRepository extends JpaRepository<Card,Long> {
     List <Card> findByGameEditionAndIsWhite(String gameEdition,boolean isWhite);
     List <Card> findByDeckIdAndIsWhiteAndIsPlayed(long deckId,boolean isWhite,boolean isPlayed);
 
+    List<Card> findByDeckId(long deckId);
+
 }

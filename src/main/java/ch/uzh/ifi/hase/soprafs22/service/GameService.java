@@ -40,9 +40,6 @@ public class GameService {
 
 
     private final DeckRepository deckRepository;
-
-    //TODO I am not sure that we need autowired here. But probably we need since we have multiple repos
-
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("gameRoundRepository") GameRoundRepository gameRoundRepository, @Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, GameRoundService gameRoundService, CardRepository cardRepository, DeckRepository deckRepository) {
         this.gameRepository = gameRepository;
@@ -107,31 +104,6 @@ public class GameService {
         return game;
     }
 
-    // NOT NEEDED AS IT IS HANDLED IN THE leaveWaitingArea
-//    // GAME DELETION - when last player leaves waiting area
-//    public void deleteGameInWaitingArea(Long gameId, String token) {
-//        // finding game
-//        Game game = gameRepository.findByGameId(gameId);
-//        if (game == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game with given Id doesn't exist!");
-//        }
-//        // check whether game has only one player, and it is the player that made the request
-//        if (game.getNumOfPlayersJoined() > 1) {
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game has more than one player!");
-//        }
-//        User user = userRepository.findByToken(token); // ! PLAYER ID SAME AS USER ID !
-//        List<Long> playerIds = game.getPlayerIds();
-//        if (!playerIds.contains(user.getUserId())) {
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not part of this game!");
-//        }else{
-//            // delete game
-//            gameRepository.delete(game);
-//            gameRepository.flush();
-//        }
-//    }
-
-
-        //TODO throw an error, if Player/User is already in a game, or if the token is expired/user logged out --> ask Szymon
     private void addPlayerToGame(Player playerToAdd, Game game){
         if (game.getNumOfPlayersJoined() < 4){
             List<Long> players = game.getPlayerIds();
@@ -148,8 +120,7 @@ public class GameService {
     }
 
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
-        // TODO delete player object for corresponding user?
-        // TODO delete player completely
+        //TODO store the performance of the Player in User for Stats and delete the Player
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
@@ -179,20 +150,12 @@ public class GameService {
                     game.setActive(true);
                     //game=gameRepository.saveAndFlush(game);
                     this.startGame(game);
-
-                    //game.setActive(true);
                 }
                 return game;
             } else { throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The user is already in the game!"); }
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
     }
 
-    // helper method to actually start the game
-    /* TODO: create a new GameRound (add it to the list of GameRounds and set
-        it as the currentRound) and add a black card to this GameRound.
-        Furthermore, create a method to give every player a role as well as
-        10 white cards.
-     */
    private void startGame(Game game) {
        // get not played white cards
         List <Card> whiteCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),true,false);
@@ -245,6 +208,7 @@ public class GameService {
     public void leaveGame(Long gameId, String token) {
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
+
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
             return; // if it does not contain then return
@@ -252,19 +216,45 @@ public class GameService {
         boolean lastPlayer = gameToLeave.getNumOfPlayersJoined() == 1;
         // remove the player
         removePlayerFromGame(gameToLeave, userToRemove);
-        // if it is the last player, also delete the game
+        // if it is the last player, also delete the game/gameRounds/
         if (lastPlayer) {
-            //TODO delete gameRound?
+            //TODO delete cards/deck after game is finished
+            //TODO delete gameRound/game
+            //deleteGame(gameToLeave); //--> call this function and delete the below 2 lines
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
         }
     }
 
-
-    //TODO we might add gameId to player entity and this function as well
+    //deletes the Cards, Deck, GameRounds, Game
+    public void deleteGame(Game gameToLeave){
+        //TODO delete cards/deck after game is finished
+        //TODO delete gameRound/game
+        Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
+        List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
+        for (Card cardToBeDeleted : cardsToBeDeleted){
+            Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
+            cardRepository.delete(deleteCard);
+        }
+        cardRepository.flush();
+        deckRepository.delete(deckToBeDeleted);
+        deckRepository.flush();
+        List<Long> gameRoundIds = gameToLeave.getRoundIds();
+        for(Long gameRoundId: gameRoundIds){
+            GameRound gameRoundToDelete = gameRoundRepository.findByRoundId(gameRoundId);
+            gameRoundRepository.delete(gameRoundToDelete);
+        }
+        gameRoundRepository.flush();
+        gameRepository.delete(gameToLeave);
+        gameRepository.flush();
+    }
 
     private Player createPlayer(String token){
         User user = userRepository.findByToken(token);
+        Player possiblePlayer = playerRepository.findByPlayerId(user.getUserId());
+        if(possiblePlayer!=null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This player already exists. Player cannot be created.");
+        }
         Player player = new Player();
         player.setPlayerId(user.getUserId());
         player.setPlayerName(user.getUsername());
@@ -343,7 +333,6 @@ public class GameService {
             //cardRepository.save(card);
         }
 
-        //TODO delete deck/cards after game is finished
         cardRepository.saveAll(cards);
         cardRepository.flush();
         deckRepository.flush();
