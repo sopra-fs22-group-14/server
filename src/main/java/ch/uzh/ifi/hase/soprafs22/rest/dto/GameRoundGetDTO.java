@@ -17,5 +17,5 @@ public class GameRoundGetDTO {
     private Card blackCard;
     private Long cardCzarId;
     private List<Card> playedCards;
-
+    private boolean isFinal;
 }
