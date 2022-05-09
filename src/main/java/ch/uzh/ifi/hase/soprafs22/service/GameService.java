@@ -258,6 +258,7 @@ public class GameService {
         player.setCardCzar(false);
         player.setRoundsWon(0);
         player.setNumberOfPicked(0);
+        player.setHasPicked(false);
         player = playerRepository.saveAndFlush(player);
         return player;
     }

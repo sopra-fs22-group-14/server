@@ -71,6 +71,7 @@ public class GameRoundService {
         for(Long playerId: players){
             Player player = playerRepository.findByPlayerId(playerId);
             player.setCardCzar(false);
+            player.setHasPicked(false);
             while (player.getCardsOnHands().size()<10){
                 List<Card> cards = player.getCardsOnHands();
                 List<Card> remainingWhiteCards = cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(), true, false);
@@ -175,6 +176,9 @@ public class GameRoundService {
         if(!currentPlayer.isCardCzar()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "player is not card Czar");
         }
+        if (currentPlayer.isHasPicked()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "card czar already picked");
+        }
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
         Long currentRoundWinnerId=currentGameRound.getCardAndPlayerIds().get(cardId);
         currentGameRound.setRoundWinnerId(currentRoundWinnerId);
@@ -198,14 +202,20 @@ public class GameRoundService {
     }
 
     public void pickCard(Long gameRoundId,String token,Long cardId){
-        //User userByToken=userRepository.findByToken(token);
+        User userByToken=userRepository.findByToken(token);
         //TODO check if he picked before
+        Player playerToPick=playerRepository.findByPlayerId(userByToken.getUserId());
+        if(playerToPick.isHasPicked()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "player already picked");
+        }
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
         Long currentPickedId=currentGameRound.getCardAndPlayerIds().get(cardId);
         Player currentPlayer=playerRepository.findByPlayerId(currentPickedId);
         int currentNumberOfPicked=currentPlayer.getNumberOfPicked();
         currentPlayer.setNumberOfPicked(currentNumberOfPicked+1);
+        playerToPick.setHasPicked(true);
         playerRepository.save(currentPlayer);
+        playerRepository.save(playerToPick);
         playerRepository.flush();
         int gameRoundNumberOfPicked=currentGameRound.getNumberOfPicked(); //how many players has played so far
         currentGameRound.setNumberOfPicked(gameRoundNumberOfPicked+1); //increase number of players ehich played by 1

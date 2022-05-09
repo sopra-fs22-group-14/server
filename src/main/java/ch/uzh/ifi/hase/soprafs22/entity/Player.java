@@ -42,6 +42,9 @@ public class Player implements Serializable {
     @OneToMany
     private List<Card> cardsOnHands=new ArrayList<>();
 
+    @Column
+    private boolean hasPicked;
+
     //@Column(nullable = false)
     //@ElementCollection
     //private List<String> CombinationsOfGame=new ArrayList<String>();
