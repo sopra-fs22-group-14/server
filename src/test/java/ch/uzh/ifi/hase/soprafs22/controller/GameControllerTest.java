@@ -177,6 +177,7 @@ public class GameControllerTest {
         testGame.setNumOfRounds(16);
         testGame.setGameEdition("family");
         given(gameService.getGameRound(anyLong())).willReturn(testRound);
+        given(gameService.getGame(anyLong())).willReturn(testGame);
         MockHttpServletRequestBuilder getRequest = get(String.format("/%s/gameround", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
         mockMvc.perform(getRequest).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

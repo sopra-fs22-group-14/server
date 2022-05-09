@@ -19,11 +19,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Transactional
@@ -296,6 +292,7 @@ public class GameService {
                 c.setWhite(false);
                 c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
                 c.setPlayed(false);
+                c.setCanBeChoosen(true);
                 cards.add(c);
                 //cardRepository.save(c);
                 blackCards.add(line); //test printing out all the Cards on Console
@@ -312,6 +309,7 @@ public class GameService {
                 c.setWhite(true);
                 c.setGameEdition(gameEdition); // Ege needed this for developing the Repo --> can be deleted
                 c.setPlayed(false);
+                c.setCanBeChoosen(true);
                 cards.add(c);
                 //cardRepository.save(c);
                 whiteCards.add(line);//test printing out all the Cards on Console
@@ -353,6 +351,7 @@ public class GameService {
     public GameRound getGameRound(Long gameId){
        Game gameById=gameRepository.findByGameId(gameId);
        GameRound gameRoundToGet=gameRoundRepository.findByRoundId(gameById.getCurrentGameRoundId());
+
        return gameRoundToGet;
 
     }
@@ -384,6 +383,13 @@ public class GameService {
         game.setWinnersNames(winnersNames);
 
         return game;
+    }
+    public Card getCard(Long cardId){
+        Card cardToGet=cardRepository.findByCardId(cardId);
+        if(cardToGet==null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "card with the id token was not found.");
+        }
+        return cardToGet;
     }
 
 

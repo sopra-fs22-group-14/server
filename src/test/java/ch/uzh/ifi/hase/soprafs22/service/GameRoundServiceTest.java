@@ -346,6 +346,30 @@ public class GameRoundServiceTest {
         assertEquals(playedRound.getRoundId(),testRound.getRoundId());
 
     }
+    @Test
+    public void playCard_cardCzarNotPlay_throwsException(){
+        Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken",7L,testGame.getGameId()));
+        String exceptionMessage = "card czar can not play a card!";
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
+    @Test
+    public void playCard_alreadyPlayed_throwsException(){
+        Map<Long,Long>testCardAndPlayerIds=new HashMap<>();
+        testCardAndPlayerIds.put(4L,2L);
+        testRound.setCardAndPlayerIds(testCardAndPlayerIds);
+        Mockito.when(userRepository.findByToken("testToken2")).thenReturn(testUser2);
+        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(playerRepository.findByPlayerId(testUser2.getUserId())).thenReturn(testPlayer2);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken2",4L,testGame.getGameId()));
+        String exceptionMessage = "player already played a card!";
+        assertEquals(exceptionMessage,exception.getReason());
+    }
 
 
 

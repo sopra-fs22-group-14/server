@@ -1,9 +1,6 @@
 package ch.uzh.ifi.hase.soprafs22.controller;
 
-import ch.uzh.ifi.hase.soprafs22.entity.Game;
-import ch.uzh.ifi.hase.soprafs22.entity.GameRound;
-import ch.uzh.ifi.hase.soprafs22.entity.Player;
-import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.entity.*;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.GameService;
@@ -13,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs22.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GameController {
@@ -156,6 +154,24 @@ public class GameController {
     public GameRoundGetDTO getRound(@RequestHeader("Authorization") String token,@PathVariable long gameId){
         userService.checkIfAuthorized(token);
         GameRound requestedGameRound=gameService.getGameRound(gameId);
+        Game gameById=gameService.getGame(gameId);
+        if(!gameById.isCardCzarMode()){
+            List<Card> currentPlayedCards=requestedGameRound.getPlayedCards();
+            Player currentPlayer=gameService.getPlayer(token);
+            if(!currentPlayedCards.isEmpty()){
+                Map<Long,Long> currentCardAndPlayerIds=requestedGameRound.getCardAndPlayerIds();
+                for(int i=0; i<currentPlayedCards.size(); i++ ){
+                    Long currentCardId=currentPlayedCards.get(i).getCardId();
+                    if(currentCardAndPlayerIds.get(currentCardId)==currentPlayer.getPlayerId()){
+                        Card cardToChange=gameService.getCard(currentCardId);
+                        cardToChange.setCanBeChoosen(false);
+                        currentPlayedCards.set(i,cardToChange);
+                        requestedGameRound.setPlayedCards(currentPlayedCards);
+                    }
+                }
+
+            }
+        }
         return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
     }
 

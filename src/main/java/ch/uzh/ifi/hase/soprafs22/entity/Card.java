@@ -40,4 +40,7 @@ public class Card implements Serializable {
 
     @Column
     private boolean isPlayed;
+
+    @Column
+    private boolean canBeChoosen;
 }
