@@ -40,6 +40,8 @@ public class GameServiceTest {
     @InjectMocks
     private User testUser3;
     @InjectMocks
+    private User testUser4;
+    @InjectMocks
     private Game testGame;
     @InjectMocks
     private Player testPlayer;
@@ -47,6 +49,8 @@ public class GameServiceTest {
     private Player testPlayer2;
     @InjectMocks
     private Player testPlayer3;
+    @InjectMocks
+    private Player testPlayer4;
     @InjectMocks
     private Card testCard;
     @InjectMocks
@@ -81,6 +85,13 @@ public class GameServiceTest {
         testUser3.setStatus(UserStatus.OFFLINE);
         testUser3.setToken("testToken3");
 
+        testUser4=new User();
+        testUser4.setUserId(9L);
+        testUser4.setPassword("testPassword");
+        testUser4.setUsername("testUsername4");
+        testUser4.setStatus(UserStatus.OFFLINE);
+        testUser4.setToken("testToken4");
+
         testPlayer=new Player();
         testPlayer.setPlayerId(1L);
         testPlayer.setPlayerName("testUsername");
@@ -98,6 +109,12 @@ public class GameServiceTest {
         testPlayer3.setPlayerName("testUsername3");
         testPlayer3.setPlaying(true);
         testPlayer3.setCardCzar(false);
+
+        testPlayer4=new Player();
+        testPlayer4.setPlayerId(9L);
+        testPlayer4.setPlayerName("testUsername4");
+        testPlayer4.setPlaying(true);
+        testPlayer4.setCardCzar(false);
 
 
 
@@ -256,14 +273,33 @@ public class GameServiceTest {
         assertEquals(foundPlayer.getCardsOnHands(),testPlayer.getCardsOnHands());
 
     }
+    /*
+    @Test //TODO how to insert 40 cards
+    public void joinGame_withStartGame_success(){
+        testGame.setNumOfPlayersJoined(3);
+        List<Long> testGamePlayerIds=new ArrayList<>();
+        testGamePlayerIds.add(1L);
+        testGamePlayerIds.add(6L);
+        testGamePlayerIds.add(9L);
+        testGame.setPlayerIds(testGamePlayerIds);
+        List<Card>testCards=new ArrayList<>();
+        testCards.add(testCard);
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
+        Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer2);
+        Mockito.when(gameRepository.saveAndFlush(Mockito.any())).thenReturn(testGame);
+        Mockito.when(cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(testGame.getDeckID(),true,false)).thenReturn(testCards);
+        Game joinedGame=gameService.joinGame(testGame.getGameId(),"testToken2");
 
-    /*@Test
+    } */
+
+    @Test
     public void getGameRound_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(gameRoundRepository.findByRoundId(testGame.getCurrentGameRoundId())).thenReturn(testRound);
         GameRound foundGameRound=gameService.getGameRound(testGame.getGameId());
         assertEquals(foundGameRound.getRoundId(),testRound.getRoundId());
-    } */ //TODO update this test
+    }
 
 
 

@@ -92,11 +92,11 @@ public class GameRoundServiceTest {
         testUser3.setToken("testToken3");
 
         testUser4=new User();
-        testUser3.setUserId(9L);
-        testUser3.setPassword("testPassword");
-        testUser3.setUsername("testUsername4");
-        testUser3.setStatus(UserStatus.OFFLINE);
-        testUser3.setToken("testToken4");
+        testUser4.setUserId(9L);
+        testUser4.setPassword("testPassword");
+        testUser4.setUsername("testUsername4");
+        testUser4.setStatus(UserStatus.OFFLINE);
+        testUser4.setToken("testToken4");
 
 
         testPlayer=new Player();
@@ -117,6 +117,7 @@ public class GameRoundServiceTest {
         testPlayer3.setPlayerName("testUsername3");
         testPlayer3.setPlaying(true);
         testPlayer3.setCardCzar(false);
+        testPlayer3.setHasPicked(false);
 
         testPlayer4=new Player();
         testPlayer4.setPlayerId(9L);
@@ -304,6 +305,8 @@ public class GameRoundServiceTest {
         testCardAndPlayerIds.put(4L,2L);
         testRound.setCardAndPlayerIds(testCardAndPlayerIds);
         testRound.setNumberOfPicked(3);
+        Mockito.when(userRepository.findByToken("testToken3")).thenReturn(testUser3);
+        Mockito.when(playerRepository.findByPlayerId(testUser3.getUserId())).thenReturn(testPlayer3);
         Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
         Mockito.when(playerRepository.findByPlayerId(2L)).thenReturn(testPlayer2);
         Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer2);
