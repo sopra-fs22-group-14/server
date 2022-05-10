@@ -162,7 +162,7 @@ public class GameController {
                 Map<Long,Long> currentCardAndPlayerIds=requestedGameRound.getCardAndPlayerIds();
                 for(int i=0; i<currentPlayedCards.size(); i++ ){
                     Long currentCardId=currentPlayedCards.get(i).getCardId();
-                    if(currentCardAndPlayerIds.get(currentCardId)==currentPlayer.getPlayerId()){
+                    if(currentCardAndPlayerIds.get(currentCardId).equals(currentPlayer.getPlayerId())){
                         Card cardToChange=gameService.getCard(currentCardId);
                         cardToChange.setCanBeChoosen(false);
                         currentPlayedCards.set(i,cardToChange);
@@ -174,7 +174,5 @@ public class GameController {
         }
         return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
     }
-
-
 
 }
