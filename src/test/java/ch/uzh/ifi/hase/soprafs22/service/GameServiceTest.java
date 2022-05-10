@@ -16,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 
+
 public class GameServiceTest {
     @Mock
     GameRepository gameRepository;
@@ -30,6 +31,10 @@ public class GameServiceTest {
     DeckRepository deckRepository;
     @InjectMocks
     private GameService gameService;
+    @Mock
+    private GameRoundService gameRoundService;
+
+
 
     @Mock
     PlayerRepository playerRepository;
@@ -85,6 +90,7 @@ public class GameServiceTest {
         testUser3.setStatus(UserStatus.OFFLINE);
         testUser3.setToken("testToken3");
 
+
         testUser4=new User();
         testUser4.setUserId(9L);
         testUser4.setPassword("testPassword");
@@ -127,7 +133,7 @@ public class GameServiceTest {
         testGame.setCardCzarMode(true);
         testGame.setCurrentGameRoundIndex(0);
         testGame.setGameEdition("family");
-        testGame.setDeckID(4L);
+        testGame.setDeckID(5L);
         testGame.setCurrentGameRoundId(8L);
         List<Long> testGamePlayerIds=new ArrayList<>();
         testGamePlayerIds.add(1L);
@@ -273,9 +279,22 @@ public class GameServiceTest {
         assertEquals(foundPlayer.getCardsOnHands(),testPlayer.getCardsOnHands());
 
     }
-    /*
-    @Test //TODO how to insert 40 cards
+
+
+    @Test
     public void joinGame_withStartGame_success(){
+        List <Card> testWhiteCards=new ArrayList<>();
+        for(int i=50; i<150; i++){
+            Card whiteCard = new Card();
+            Long l=Long.valueOf(i);
+            whiteCard.setCardId(l);
+            whiteCard.setCardText("testBlackCard");
+            whiteCard.setGameEdition("family");
+            whiteCard.setDeckId(5L);
+            whiteCard.setWhite(false);
+            whiteCard.setPlayed(true);
+            testWhiteCards.add(whiteCard);
+        }
         testGame.setNumOfPlayersJoined(3);
         List<Long> testGamePlayerIds=new ArrayList<>();
         testGamePlayerIds.add(1L);
@@ -286,12 +305,40 @@ public class GameServiceTest {
         testCards.add(testCard);
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
+        Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
         Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer2);
         Mockito.when(gameRepository.saveAndFlush(Mockito.any())).thenReturn(testGame);
-        Mockito.when(cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(testGame.getDeckID(),true,false)).thenReturn(testCards);
+        Mockito.when(cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(testGame.getDeckID(),true,false)).thenReturn(testWhiteCards);
+        Mockito.when(playerRepository.findByPlayerId(testGame.getPlayerIds().get(0))).thenReturn(testPlayer);
+        Mockito.when(playerRepository.findByPlayerId(testGame.getPlayerIds().get(1))).thenReturn(testPlayer);
+        Mockito.when(playerRepository.findByPlayerId(testGame.getPlayerIds().get(2))).thenReturn(testPlayer);
+        Mockito.when(playerRepository.findByPlayerId(2L)).thenReturn(null,testPlayer2);
+        Mockito.when(gameRoundService.startNewRound(testGame)).thenReturn(testRound);
         Game joinedGame=gameService.joinGame(testGame.getGameId(),"testToken2");
 
-    } */
+    }
+    @Test
+    public void getCard_success(){
+        Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(testCard);
+        Card foundCard=gameService.getCard(testCard.getCardId());
+        assertEquals(foundCard.getCardId(),testCard.getCardId());
+    }
+    @Test
+    public void get_Card_notExists_throwsException(){
+        Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(null);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.getCard(testCard.getCardId()));
+        String exceptionMessage = "card with the id was not found.";
+        assertEquals(exceptionMessage,exception.getReason());
+    }
+    @Test
+    public void isInGame_notInGame_throwsException(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser3.getToken())).thenReturn(testUser3);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.isInGame(testUser3.getToken(),testGame.getGameId()));
+        String exceptionMessage = "player is not in this game!";
+        assertEquals(exceptionMessage,exception.getReason());
+    }
+
 
     @Test
     public void getGameRound_success(){
