@@ -327,7 +327,7 @@ public class GameServiceTest {
     public void get_Card_notExists_throwsException(){
         Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(null);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.getCard(testCard.getCardId()));
-        String exceptionMessage = "card with the id was not found.";
+        String exceptionMessage = "card with the id token was not found.";
         assertEquals(exceptionMessage,exception.getReason());
     }
     @Test
