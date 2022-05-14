@@ -338,6 +338,22 @@ public class GameServiceTest {
         String exceptionMessage = "player is not in this game!";
         assertEquals(exceptionMessage,exception.getReason());
     }
+    @Test
+    public void isInGame_playerInGame_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
+        gameService.isInGame("testToken",testGame.getGameId());
+
+    }
+    @Test
+    public void getGameSummaryAndWinner_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(playerRepository.findByPlayerId(1L)).thenReturn(testPlayer);
+        Game foundGame=gameService.getGameSummaryAndWinner(testGame.getGameId());
+        assertEquals(foundGame.getGameId(),testGame.getGameId());
+
+    }
+
 
 
     @Test
