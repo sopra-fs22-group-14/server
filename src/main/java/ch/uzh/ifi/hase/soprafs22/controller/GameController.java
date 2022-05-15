@@ -145,8 +145,9 @@ public class GameController {
         userService.checkIfAuthorized(token);
         Player requestedPlayer=gameService.getPlayer(token);
         return DTOMapper.INSTANCE.convertEntityToPlayerGetDTO(requestedPlayer);
-
     }
+
+
     //need to test this controller
     @GetMapping("/{gameId}/gameround")
     @ResponseStatus(HttpStatus.OK)

@@ -90,5 +90,9 @@ public interface DTOMapper {
     @Mapping(source = "winnersIds", target = "winnersIds")
     GameSummaryGetDTO convertEntityToGameSummaryGetDTO(Game game);
 
+    @Mapping(source = "birthday", target = "birthday")
+    @Mapping(source = "username", target = "username")
+    UserProfileGetDTO convertEntityToUserProfileGetDTO(User requestedUser);
+
 
 }

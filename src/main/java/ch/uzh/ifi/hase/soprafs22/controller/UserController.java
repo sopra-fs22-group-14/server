@@ -4,12 +4,15 @@ import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserProfileGetDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserProfilePutDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,11 +34,12 @@ public class UserController {
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<UserGetDTO> getAllUsers() {
+    public List<UserGetDTO> getAllUsers(@RequestHeader("Authorization") String token) {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
+    User requestedUser = userService.getUser(token);
+    users.remove(requestedUser);
     List<UserGetDTO> userGetDTOs = new ArrayList<>();
-
     // convert each user to the API representation
     for (User user : users) {
         userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
@@ -67,6 +71,25 @@ public class UserController {
         User loggedInUser=userService.login(userInput);
 
          return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(loggedInUser);
+    }
+
+    @GetMapping("/users/{loggedInUserID}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserProfileGetDTO getUserProfile(@RequestHeader("Authorization") String token, @PathVariable Long userId){
+        userService.checkIfAuthorized(token);
+        userService.checkIfTokenMatchesUserId(token, userId);
+        User requestedUser = userService.getUser(token);
+        return DTOMapper.INSTANCE.convertEntityToUserProfileGetDTO(requestedUser);
+    }
+
+    @PutMapping("/users/{loggedInUserID}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void changeUserProfile(@RequestHeader("Authorization") String token, @PathVariable Long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
+        userService.checkIfAuthorized(token);
+        userService.checkIfTokenMatchesUserId(token, userId);
+        userService.changeUserProfile(token, userProfilePutDTO.getUsername(), userProfilePutDTO.getBirthday(), userProfilePutDTO.getPassword());
     }
 
     @PostMapping("users/logout")

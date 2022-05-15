@@ -86,7 +86,9 @@ public class GameService {
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
-        game.setNumOfRounds(gameInput.getNumOfRounds());
+        //game.setNumOfRounds(gameInput.getNumOfRounds());
+        //TODO set RoundValues back to User input
+        game.setNumOfRounds(3);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
         // admin player is the one who creates game
@@ -185,7 +187,6 @@ public class GameService {
        }
 
         GameRound currentGameRound=gameRoundService.startNewRound(game);
-
        return;
     }
 
@@ -228,10 +229,11 @@ public class GameService {
         //TODO delete gameRound/game
         Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
         List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
-        for (Card cardToBeDeleted : cardsToBeDeleted){
-            Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
-            cardRepository.delete(deleteCard);
-        }
+        //for (Card cardToBeDeleted : cardsToBeDeleted){
+            //Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
+            //cardRepository.delete(deleteCard);
+        //}
+        cardRepository.deleteAll(cardsToBeDeleted);
         cardRepository.flush();
         deckRepository.delete(deckToBeDeleted);
         deckRepository.flush();
