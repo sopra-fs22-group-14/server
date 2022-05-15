@@ -15,6 +15,6 @@ import java.util.Date;
 public class UserProfileGetDTO {
 
   private String username;
-  private Date birthdate;
+  private Date birthday;
 
 }
