@@ -173,7 +173,6 @@ public class GameService {
        for(Long playerId: game.getPlayerIds()){
            Player currentPlayer=playerRepository.findByPlayerId(playerId);
            for(int i=0; i<10; i++){
-               //System.out.println("test");
                Card currentCard=whiteCards.get(arr[card_Index]);
                List <Card>playerCards=currentPlayer.getCardsOnHands();
                playerCards.add(currentCard);
@@ -184,6 +183,7 @@ public class GameService {
            }
            playerRepository.saveAndFlush(currentPlayer);
        }
+
         GameRound currentGameRound=gameRoundService.startNewRound(game);
 
        return;

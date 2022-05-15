@@ -30,7 +30,7 @@ public class GameRoundController {
     public GameRoundGetDTO playWhiteCard(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
         gameService.isInGame(token,gameRoundPostDTO.getGameId());
-        GameRound requestedGameRound=gameRoundService.playCard(gameRoundId,token,gameRoundPostDTO.getCardId(),gameRoundPostDTO.getGameId());
+        GameRound requestedGameRound=gameRoundService.playCard(gameRoundId,token,gameRoundPostDTO.getCardId(),gameRoundPostDTO.getGameId(),gameRoundPostDTO.getCurrentCombination());
         return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
     }
 

@@ -74,6 +74,7 @@ public interface DTOMapper {
     @Mapping(source = "playing", target = "playing")
     @Mapping(source = "roundsWon", target = "roundsWon")
     @Mapping(source = "cardsOnHands", target = "cardsOnHands")
+    @Mapping(source = "playedCombinations", target = "playedCombinations")
     PlayerGetDTO convertEntityToPlayerGetDTO(Player player);
 
     @Mapping(source = "roundId", target = "roundId")

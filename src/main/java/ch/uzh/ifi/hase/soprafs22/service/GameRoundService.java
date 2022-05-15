@@ -109,7 +109,7 @@ public class GameRoundService {
         return game.getPlayerIds().get(nextCardCzarPos);
 
     }
-    public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId){
+    public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
         User userByToken=userRepository.findByToken(token);
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
         Game currentGame=gameRepository.findByGameId(gameId);
@@ -137,6 +137,9 @@ public class GameRoundService {
         currentGameRound.setPlayedCards(currentPlayedCards);
         currentCardsOnHand.remove(playedCard);
         currentPlayer.setCardsOnHands(currentCardsOnHand);
+        List<String> currentPlayedCombinations=currentPlayer.getPlayedCombinations();
+        currentPlayedCombinations.add(currentCombination);
+        currentPlayer.setPlayedCombinations(currentPlayedCombinations);
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
         playerRepository.saveAndFlush(currentPlayer);

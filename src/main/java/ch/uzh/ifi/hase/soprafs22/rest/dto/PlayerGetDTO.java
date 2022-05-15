@@ -19,4 +19,5 @@ public class PlayerGetDTO {
     private boolean isPlaying;
     private int roundsWon;
     private List<Card> cardsOnHands;
+    private List<String> playedCombinations;
 }

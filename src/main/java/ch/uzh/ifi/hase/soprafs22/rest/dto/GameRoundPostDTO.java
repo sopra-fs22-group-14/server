@@ -12,4 +12,5 @@ import lombok.Setter;
 public class GameRoundPostDTO {
     private Long cardId;
     private Long gameId;
+    private String currentCombination;
 }

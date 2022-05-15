@@ -345,7 +345,7 @@ public class GameRoundServiceTest {
         Mockito.when(cardRepository.findByCardId(testCard2.getCardId())).thenReturn(testCard2);
         Mockito.when(gameRoundRepository.save(Mockito.any())).thenReturn(testRound);
         Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer2);
-        GameRound playedRound=gameRoundService.playCard(testRound.getRoundId(),"testToken2",testCard2.getCardId(),testGame.getGameId());
+        GameRound playedRound=gameRoundService.playCard(testRound.getRoundId(),"testToken2",testCard2.getCardId(),testGame.getGameId(),"testCombination");
         assertEquals(playedRound.getRoundId(),testRound.getRoundId());
 
     }
@@ -355,7 +355,7 @@ public class GameRoundServiceTest {
         Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken",7L,testGame.getGameId()));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken",7L,testGame.getGameId(),"testCombination"));
         String exceptionMessage = "card czar can not play a card!";
         assertEquals(exceptionMessage,exception.getReason());
 
@@ -369,7 +369,7 @@ public class GameRoundServiceTest {
         Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(playerRepository.findByPlayerId(testUser2.getUserId())).thenReturn(testPlayer2);
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken2",4L,testGame.getGameId()));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameRoundService.playCard(testRound.getRoundId(),"testToken2",4L,testGame.getGameId(),"testCombination"));
         String exceptionMessage = "player already played a card!";
         assertEquals(exceptionMessage,exception.getReason());
     }

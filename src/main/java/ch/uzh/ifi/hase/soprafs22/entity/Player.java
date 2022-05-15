@@ -45,6 +45,10 @@ public class Player implements Serializable {
     @Column
     private boolean hasPicked;
 
+    @Column
+    @ElementCollection
+    private List<String> playedCombinations=new ArrayList<>();
+
     //@Column(nullable = false)
     //@ElementCollection
     //private List<String> CombinationsOfGame=new ArrayList<String>();
