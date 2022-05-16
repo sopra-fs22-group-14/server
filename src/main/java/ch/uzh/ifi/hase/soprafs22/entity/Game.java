@@ -71,10 +71,6 @@ public class Game implements Serializable{
     @ElementCollection
     private List<Long> playerIds = new ArrayList<>();
 
-    //TODO this also works decide which one to use
-    //@OneToMany
-    //private List<Player> playerList = new ArrayList<>();
-
     @Column
     @ElementCollection
     private List<Long> roundIds = new ArrayList<>();

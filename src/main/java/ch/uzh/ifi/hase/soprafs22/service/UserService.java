@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -45,10 +46,17 @@ public class UserService {
     public void checkIfAuthorized(String token){
         User userByToken=userRepository.findByToken(token);
         if (userByToken == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not Authorized!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authorized!");
         }
     }
 
+    public void checkIfTokenMatchesUserId(String token, Long userId){
+        User userById = userRepository.findByUserId(userId);
+        String userByIdToken = userById.getToken();
+        if(!userByIdToken.equals(token)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authorized!");
+        }
+    }
 
     //getAllUsersFromRepo
     public List<User> getUsers() {
@@ -61,6 +69,11 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist!");
         }
         return userByToken;
+    }
+
+    public User getUserRecords(Long userId){
+        User userById = userRepository.findByUserId(userId);
+        return userById;
     }
 
 
@@ -114,7 +127,6 @@ public class UserService {
         if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
         }
-
         User userByUsername=userRepository.findByUsername(username);
         if (userByUsername == null) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given username was not found.");
@@ -130,6 +142,22 @@ public class UserService {
 
     }
 
+    public void changeUserProfile(String token, String username, Date birthday, String password){
+        User requestedUser = userRepository.findByToken(token);
+        String usernameFromDb = requestedUser.getUsername();
+        if (requestedUser.getPassword().equals(password)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The entered password is incorrect. Please enter your correct password");
+        } else if(userRepository.findByUsername(username)!=null) {
+            if(!usernameFromDb.equals(username)){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "This username already exists. Please choose another username");
+            }
+        }
+        requestedUser.setUsername(username);
+        requestedUser.setBirthday(birthday);
+        //requestedUser.setPassword(password);
+        userRepository.saveAndFlush(requestedUser);
+    }
+
     public User logout(String token) {
         User userByToken=userRepository.findByToken(token);
         if (userByToken == null) {
@@ -141,18 +169,5 @@ public class UserService {
         return userByToken;
     }
 
-    //needed for later --- why just not findUserById from repository?
-    public User getUserById(Long id){
-        List<User> userList = getUsers();
-        for (User user : userList) { //foreach to look through the UserList for the correct user
-            if(user.getUserId().equals(id)){
-                return user;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Non existing id. User was not found");
-    }
 
-    //public void makeUserOnline(User loggedInUser){loggedInUser.setStatus(true);}
-
-    //public void makeUserOffline(User loggedOutUser){loggedOutUser.setStatus(false);}
 }

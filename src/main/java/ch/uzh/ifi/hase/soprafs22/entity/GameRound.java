@@ -30,7 +30,6 @@ public class GameRound {
     //@Column(nullable = false)
     //private int roundNumber;
 
-    //TODO not sure about jsonignore properties
     @OneToOne
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JoinColumn

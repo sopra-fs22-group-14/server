@@ -148,7 +148,6 @@ public class GameRoundService {
 
     }
 
-
     public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
         Game requestedGame=gameRepository.findByGameId(gameId);
         if (requestedGame.isCardCzarMode()) {

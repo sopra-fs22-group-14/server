@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
-import ch.uzh.ifi.hase.soprafs22.constant.CardColor;
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.*;
 import ch.uzh.ifi.hase.soprafs22.repository.*;
@@ -87,7 +86,8 @@ public class GameService {
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
         //game.setNumOfRounds(gameInput.getNumOfRounds());
-        game.setNumOfRounds(4);
+        //TODO set RoundValues back to User input
+        game.setNumOfRounds(3);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
         // admin player is the one who creates game
@@ -186,7 +186,6 @@ public class GameService {
        }
 
         GameRound currentGameRound=gameRoundService.startNewRound(game);
-
        return;
     }
 
@@ -202,7 +201,7 @@ public class GameService {
     }
 
     // method if a player decides to leave the game
-    public void leaveGame(Long gameId, String token) {
+    public void leaveGame(Long gameId, String token) { //frontend knows the winner -->
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
 
@@ -229,10 +228,11 @@ public class GameService {
         //TODO delete gameRound/game
         Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
         List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
-        for (Card cardToBeDeleted : cardsToBeDeleted){
-            Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
-            cardRepository.delete(deleteCard);
-        }
+        //for (Card cardToBeDeleted : cardsToBeDeleted){
+            //Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
+            //cardRepository.delete(deleteCard);
+        //}
+        cardRepository.deleteAll(cardsToBeDeleted);
         cardRepository.flush();
         deckRepository.delete(deckToBeDeleted);
         deckRepository.flush();
@@ -383,6 +383,7 @@ public class GameService {
         game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
         game.setWinnersIds(winnersIds);
         game.setWinnersNames(winnersNames);
+        //TODO send records from Player to User
 
         return game;
     }

@@ -50,6 +50,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Temporal(TemporalType.DATE)
+    private Date birthday;
+
     @CreationTimestamp
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
