@@ -71,6 +71,11 @@ public class UserService {
         return userByToken;
     }
 
+    public User getUserRecords(Long userId){
+        User userById = userRepository.findByUserId(userId);
+        return userById;
+    }
+
 
     /** PRODUCTION READY*/
     /** SZYMON */
@@ -120,7 +125,6 @@ public class UserService {
         if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
         }
-
         User userByUsername=userRepository.findByUsername(username);
         if (userByUsername == null) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given username was not found.");

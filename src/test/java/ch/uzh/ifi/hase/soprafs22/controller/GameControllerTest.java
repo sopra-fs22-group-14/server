@@ -81,7 +81,8 @@ public class GameControllerTest {
         given(gameService.joinableGames()).willReturn(joinableGames);
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/games").contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+            MockHttpServletRequestBuilder getRequest = get("/games").contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization","currenttoken");
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())

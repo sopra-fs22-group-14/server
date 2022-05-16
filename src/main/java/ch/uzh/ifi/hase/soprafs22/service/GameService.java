@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
-import ch.uzh.ifi.hase.soprafs22.constant.CardColor;
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.*;
 import ch.uzh.ifi.hase.soprafs22.repository.*;
@@ -202,7 +201,7 @@ public class GameService {
     }
 
     // method if a player decides to leave the game
-    public void leaveGame(Long gameId, String token) {
+    public void leaveGame(Long gameId, String token) { //frontend knows the winner -->
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
 
@@ -384,6 +383,7 @@ public class GameService {
         game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
         game.setWinnersIds(winnersIds);
         game.setWinnersNames(winnersNames);
+        //TODO send records from Player to User
 
         return game;
     }

@@ -31,11 +31,17 @@ public interface DTOMapper {
 
     @Mapping(source = "userId", target = "id")
     @Mapping(source = "username", target = "username")
-    @Mapping(source = "status", target = "status")
+    @Mapping(source = "status", target = "status") //--> source=User.java    target=UserGETDTO.java --> see imports
     UserGetDTO convertEntityToUserGetDTO(User user);
     // --- build gradle gives warning unmapped properties |!|
 
-
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "totalGamePlayed", target = "totalGamePlayed")
+    @Mapping(source = "totalGameWon", target = "totalGameWon") //--> source=User.java    target=UserGETDTO.java --> see imports
+    @Mapping(source = "totalRoundPlayed", target = "totalRoundPlayed")
+    @Mapping(source = "totalRoundWon", target = "totalRoundWon")
+    @Mapping(source = "bestCombinations", target = "bestCombinations")
+    UserRecordsGetDTO convertEntityToUserRecordsGetDTO(User user);
 
 
     // Need when user logs in - while registering + while logging in
