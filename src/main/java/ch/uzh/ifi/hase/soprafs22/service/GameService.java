@@ -86,7 +86,8 @@ public class GameService {
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
-        game.setNumOfRounds(gameInput.getNumOfRounds());
+        //game.setNumOfRounds(gameInput.getNumOfRounds());
+        game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
         // admin player is the one who creates game
