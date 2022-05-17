@@ -236,6 +236,9 @@ public class GameRoundService {
             if(!currentGameRound.isFinal()) { //if it is final round don't start a new round
                 startNewRound(currentGame);
             }
+            else if(currentGameRound.isFinal()){
+                transferPoints(currentGame);
+            }
         }
     }
     private void transferPoints(Game game){
@@ -245,9 +248,16 @@ public class GameRoundService {
             Player currentPlayer=playerRepository.findByPlayerId(currentPlayerId);
             User userById=userRepository.findByUserId(currentPlayerId);
             int playerTotalRoundWon=currentPlayer.getNumberOfPicked();
-            int userTotalRoundWon=userById.getTotalRoundWon();
-            int currentTotalRoundWon=playerTotalRoundWon+userTotalRoundWon;
-            userById.setTotalRoundWon(currentTotalRoundWon);
+            if(game.isCardCzarMode()){
+                int userTotalRoundWon=userById.getTotalRoundWon();
+                int currentTotalRoundWon=playerTotalRoundWon+userTotalRoundWon;
+                userById.setTotalRoundWon(currentTotalRoundWon);
+            }
+            else if(!game.isCardCzarMode()){
+                int userTotalTimesPicked=userById.getTimesPicked();
+                int currentTotalTimesPicked=userTotalTimesPicked+playerTotalRoundWon;
+                userById.setTimesPicked(currentTotalTimesPicked);
+            }
             if(currentPlayer.getNumberOfPicked()>maxRoundWin){
                 maxRoundWin=currentPlayer.getNumberOfPicked();
             }

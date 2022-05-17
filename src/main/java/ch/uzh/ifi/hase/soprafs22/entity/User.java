@@ -69,6 +69,8 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private int totalRoundWon;
+    @Column(nullable = false)
+    private int timesPicked;
 
     @Column(nullable = false)
     @ElementCollection
