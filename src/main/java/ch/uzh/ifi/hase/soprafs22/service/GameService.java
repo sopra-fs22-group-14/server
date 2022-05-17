@@ -87,7 +87,7 @@ public class GameService {
         game.setCurrentGameRoundIndex(0);
         //game.setNumOfRounds(gameInput.getNumOfRounds());
         //TODO set RoundValues back to User input
-        game.setNumOfRounds(3);
+        game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
         // admin player is the one who creates game

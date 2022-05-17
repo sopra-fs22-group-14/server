@@ -193,6 +193,9 @@ public class GameRoundService {
         if(!currentGameRound.isFinal()) {
             startNewRound(currentGame); //if it is last round don't start a new round
         }
+        else if(currentGameRound.isFinal()){
+            transferPoints(currentGame);
+        }
 
         // and return the old round winner
         return currentRoundWinnerName;
@@ -228,6 +231,42 @@ public class GameRoundService {
             if(!currentGameRound.isFinal()) { //if it is final round don't start a new round
                 startNewRound(currentGame);
             }
+            else if(currentGameRound.isFinal()){
+                transferPoints(currentGame);
+            }
+        }
+    }
+    private void transferPoints(Game game){
+        List<Long>currentPlayerIds=game.getPlayerIds();
+        int maxRoundWin=0;
+        for(Long currentPlayerId: currentPlayerIds){
+            Player currentPlayer=playerRepository.findByPlayerId(currentPlayerId);
+            User userById=userRepository.findByUserId(currentPlayerId);
+            int playerTotalRoundWon=currentPlayer.getNumberOfPicked();
+            if(game.isCardCzarMode()){
+                int userTotalRoundWon=userById.getTotalRoundWon();
+                int currentTotalRoundWon=playerTotalRoundWon+userTotalRoundWon;
+                userById.setTotalRoundWon(currentTotalRoundWon);
+            }
+            else if(!game.isCardCzarMode()){
+                int userTotalTimesPicked=userById.getTimesPicked();
+                int currentTotalTimesPicked=userTotalTimesPicked+playerTotalRoundWon;
+                userById.setTimesPicked(currentTotalTimesPicked);
+            }
+            if(currentPlayer.getNumberOfPicked()>maxRoundWin){
+                maxRoundWin=currentPlayer.getNumberOfPicked();
+            }
+            userRepository.saveAndFlush(userById);
+        }
+        for(Long currentPlayerId: currentPlayerIds){
+            Player currentPlayer=playerRepository.findByPlayerId(currentPlayerId);
+            if(currentPlayer.getNumberOfPicked()==(maxRoundWin)){
+               User userById=userRepository.findByUserId(currentPlayerId);
+               int currentTotalGameWon=userById.getTotalGameWon();
+               userById.setTotalGameWon(currentTotalGameWon+1);
+               userRepository.saveAndFlush(userById);
+            }
+
         }
     }
 

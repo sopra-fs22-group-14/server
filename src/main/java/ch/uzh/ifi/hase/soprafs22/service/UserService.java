@@ -84,7 +84,9 @@ public class UserService {
         newUser.setToken(newToken);
         newUser.setStatus(UserStatus.ONLINE);
         newUser.setCreationDate(new Date());
-
+        newUser.setTotalRoundWon(0);
+        newUser.setTotalGameWon(0);
+        newUser.setTimesPicked(0);
         checkIfUserExists(newUser);
 
         // saves the given entity but data is only persisted in the database once
