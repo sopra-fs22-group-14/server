@@ -15,10 +15,9 @@ import java.util.List;
 public class UserRecordsGetDTO {
 
   private String username;
-  private int totalGamePlayed;
-  private int totalGameWon;
-  private int totalRoundPlayed;
   private int totalRoundWon;
+  private int timesPicked;
+  private int totalGameWon;
   private List<String> bestCombinations;
 
 }
