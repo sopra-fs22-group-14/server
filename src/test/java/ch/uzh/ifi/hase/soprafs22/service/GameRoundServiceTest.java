@@ -451,6 +451,73 @@ public class GameRoundServiceTest {
         assertEquals(foundRounds.get(0).getRoundId(),testRounds.get(0).getRoundId());
 
     }
+    @Test
+    public void chooseRoundWinner_transferPoints_success(){
+        Map<Long,Long>testCardAndPlayerIds=new HashMap<>();
+        testCardAndPlayerIds.put(4L,2L);
+        testRound.setCardAndPlayerIds(testCardAndPlayerIds);
+        testRound.setFinal(true);
+        testPlayer.setNumberOfPicked(5);
+        testPlayer2.setNumberOfPicked(2);
+        Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+        Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
+        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
+        Mockito.when(playerRepository.findByPlayerId(2L)).thenReturn(testPlayer2);
+        Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer2);
+        Mockito.when(gameRoundRepository.saveAndFlush(Mockito.any())).thenReturn(testRound);
+        Mockito.when(gameRepository.findByGameId(testRound.getCorrespondingGameId())).thenReturn(testGame);
+        List<Card>testCards=new ArrayList<>();
+        List<Card>blackCards=new ArrayList<>();
+        testCards.add(testCard);
+        testCards.add(testCard2);
+        blackCards.add(testCard2);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(testGame.getDeckID(),true,false)).thenReturn(testCards);
+        Mockito.when(cardRepository.saveAndFlush(Mockito.any())).thenReturn(testCard);
+        Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer);
+        Mockito.when(deckRepository.findByDeckId(testGame.getDeckID())).thenReturn(testDeck);
+        Mockito.when(cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(testGame.getDeckID(),false,false)).thenReturn(blackCards);
+        Mockito.when(cardRepository.saveAndFlush(Mockito.any())).thenReturn(testCard2);
+        Mockito.when(gameRoundRepository.save(Mockito.any())).thenReturn(testRound);
+        Mockito.when(gameRepository.save(Mockito.any())).thenReturn(testGame);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer);
+        Mockito.when(gameRoundRepository.save(Mockito.any())).thenReturn(testRound);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        Mockito.when(userRepository.findByUserId(2L)).thenReturn(testUser2);
+        String foundName=gameRoundService.chooseRoundWinner(testRound.getRoundId(),"testToken",4L);
+        assertEquals(foundName,testPlayer2.getPlayerName());
+
+    }
+    @Test
+    public void pickCard_transferPoints_success(){
+        Map<Long,Long>testCardAndPlayerIds=new HashMap<>();
+        testCardAndPlayerIds.put(4L,2L);
+        testRound.setCardAndPlayerIds(testCardAndPlayerIds);
+        testRound.setNumberOfPicked(3);
+        testRound.setFinal(true);
+        testGame.setCardCzarMode(false);
+        testPlayer.setNumberOfPicked(2);
+        testPlayer2.setNumberOfPicked(2);
+        testPlayer3.setNumberOfPicked(4);
+        testUser.setTimesPicked(0);
+        testUser2.setTimesPicked(0);
+        testUser3.setTimesPicked(0);
+        Mockito.when(userRepository.findByToken("testToken3")).thenReturn(testUser3);
+        Mockito.when(playerRepository.findByPlayerId(testUser3.getUserId())).thenReturn(testPlayer3);
+        Mockito.when(gameRoundRepository.findByRoundId(testRound.getRoundId())).thenReturn(testRound);
+        Mockito.when(playerRepository.findByPlayerId(2L)).thenReturn(testPlayer2);
+        Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer2);
+        Mockito.when(gameRoundRepository.save(Mockito.any())).thenReturn(testRound);
+        Mockito.when(gameRepository.findByGameId(testRound.getCorrespondingGameId())).thenReturn(testGame);
+        Mockito.when(gameRepository.save(Mockito.any())).thenReturn(testGame);
+        Mockito.when(playerRepository.findByPlayerId(1L)).thenReturn(testPlayer);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        Mockito.when(userRepository.findByUserId(2L)).thenReturn(testUser2);
+        Mockito.when(userRepository.findByUserId(testUser3.getUserId())).thenReturn(testUser3);
+        gameRoundService.pickCard(testRound.getRoundId(),"testToken3",4L);
+
+    }
 
 
 
