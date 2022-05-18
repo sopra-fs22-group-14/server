@@ -60,7 +60,7 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(loggedInUser);
     }
 
-    @GetMapping("/users/{loggedInUserID}")
+    @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserProfileGetDTO getUserProfile(@RequestHeader("Authorization") String token, @PathVariable long userId){
@@ -79,7 +79,7 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserRecordsGetDTO(requestedUser);
     }
 
-    @PutMapping("/users/{loggedInUserID}")
+    @PutMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void changeUserProfile(@RequestHeader("Authorization") String token, @PathVariable long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
