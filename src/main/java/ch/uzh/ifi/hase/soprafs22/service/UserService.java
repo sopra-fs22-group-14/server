@@ -145,7 +145,7 @@ public class UserService {
     public void changeUserProfile(String token, String username, Date birthday, String oldPassword){
         User requestedUser = userRepository.findByToken(token);
         String usernameFromDb = requestedUser.getUsername();
-        if (requestedUser.getPassword().equals(oldPassword)) {
+        if (!requestedUser.getPassword().equals(oldPassword)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The entered password is incorrect. Please enter your correct password");
         } else if(userRepository.findByUsername(username)!=null) {
             if(!usernameFromDb.equals(username)){
