@@ -142,22 +142,36 @@ public class UserService {
 
     }
 
-    public void changeUserProfile(String token, String username, Date birthday, String oldPassword){
+    public void changeUserProfile(String token, String username, Date birthday, String password){
         User requestedUser = userRepository.findByToken(token);
         String usernameFromDb = requestedUser.getUsername();
-        if (!requestedUser.getPassword().equals(oldPassword)) {
+        if (!requestedUser.getPassword().equals(password)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The entered password is incorrect. Please enter your correct password");
-        } else if(userRepository.findByUsername(username)!=null) {
+        } else if ((username == null || username.trim().isEmpty())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the username.");
+        }
+        else if(userRepository.findByUsername(username)!=null) {
             if(!usernameFromDb.equals(username)){
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "This username already exists. Please choose another username");
             }
         }
         requestedUser.setUsername(username);
         requestedUser.setBirthday(birthday);
-        //requestedUser.setPassword(newPassword);
-        //String newToken=generateUniqueToken();
-        //requestedUser.setToken(newToken);
         userRepository.saveAndFlush(requestedUser);
+    }
+
+    public User changeUserPassword(String token, String oldPassword, String newPassword){
+        User requestedUser = userRepository.findByToken(token);
+        if (!requestedUser.getPassword().equals(oldPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The entered password is incorrect. Please enter your correct password");
+        } else if ( (newPassword == null || newPassword.trim().isEmpty())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the password.");
+        }
+
+        requestedUser.setPassword(newPassword);
+        String newToken=generateUniqueToken();
+        requestedUser.setToken(newToken);
+        return requestedUser;
     }
 
     public User logout(String token) {
@@ -166,7 +180,9 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given token was not found.");
         }
         userByToken.setStatus(UserStatus.OFFLINE);
-        //userByToken.setToken("");
+        // TODO test logout with randomToken
+        //String randomToken = generateUniqueToken();
+        //userByToken.setToken(randomToken);
         userRepository.saveAndFlush(userByToken);
         return userByToken;
     }

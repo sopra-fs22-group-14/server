@@ -265,7 +265,6 @@ public class GameService {
         return player;
     }
 
-
     public Deck createDeck(String gameEdition) {
 
         Deck d = new Deck();
@@ -321,7 +320,6 @@ public class GameService {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         //test printing out all the Cards on Console
         cards=cardRepository.saveAll(cards);
         cardRepository.flush();
@@ -333,7 +331,6 @@ public class GameService {
             card.setDeckId(d.getDeckId());
             //cardRepository.save(card);
         }
-
         cardRepository.saveAll(cards);
         cardRepository.flush();
         deckRepository.flush();

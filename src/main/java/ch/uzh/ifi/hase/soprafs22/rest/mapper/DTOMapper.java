@@ -99,5 +99,8 @@ public interface DTOMapper {
     @Mapping(source = "username", target = "username")
     UserProfileGetDTO convertEntityToUserProfileGetDTO(User requestedUser);
 
+    @Mapping(source = "token", target = "token")
+    UserPasswordGetDTO convertEntityToUserPasswordGetDTO(User requestedUser);
+
 
 }
