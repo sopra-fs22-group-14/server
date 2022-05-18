@@ -63,7 +63,7 @@ public class UserController {
     @GetMapping("/users/{loggedInUserID}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserProfileGetDTO getUserProfile(@RequestHeader("Authorization") String token, @PathVariable Long userId){
+    public UserProfileGetDTO getUserProfile(@RequestHeader("Authorization") String token, @PathVariable long userId){
         userService.checkIfAuthorized(token);
         userService.checkIfTokenMatchesUserId(token, userId);
         User requestedUser = userService.getUser(token);
@@ -73,7 +73,7 @@ public class UserController {
     @GetMapping("/users/{userId}/records")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserRecordsGetDTO getUserRecords(@RequestHeader("Authorization") String token, @PathVariable Long userId){
+    public UserRecordsGetDTO getUserRecords(@RequestHeader("Authorization") String token, @PathVariable long userId){
         userService.checkIfAuthorized(token);
         User requestedUser = userService.getUserRecords(userId);
         return DTOMapper.INSTANCE.convertEntityToUserRecordsGetDTO(requestedUser);
@@ -82,7 +82,7 @@ public class UserController {
     @PutMapping("/users/{loggedInUserID}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void changeUserProfile(@RequestHeader("Authorization") String token, @PathVariable Long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
+    public void changeUserProfile(@RequestHeader("Authorization") String token, @PathVariable long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
         userService.checkIfAuthorized(token);
         userService.checkIfTokenMatchesUserId(token, userId);
         userService.changeUserProfile(token, userProfilePutDTO.getUsername(), userProfilePutDTO.getBirthday(), userProfilePutDTO.getPassword());
