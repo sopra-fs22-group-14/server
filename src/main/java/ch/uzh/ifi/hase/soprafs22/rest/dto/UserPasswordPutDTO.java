@@ -6,18 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRecordsGetDTO {
+public class UserPasswordPutDTO {
 
-  private String username;
-  private int totalRoundWon;
-  private int timesPicked;
-  private int totalGameWon;
-  private List<String> bestCombinations;
+  private String token;
+  private String oldPassword;
+  private String newPassword;
 
 }

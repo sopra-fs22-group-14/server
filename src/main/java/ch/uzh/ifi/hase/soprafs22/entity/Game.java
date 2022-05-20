@@ -67,6 +67,7 @@ public class Game implements Serializable{
     //@Column(nullable = false, unique=true)
     //@ElementCollection
     //private List<Player> playerList = new ArrayList<>;
+
     @Column
     @ElementCollection
     private List<Long> playerIds = new ArrayList<>();

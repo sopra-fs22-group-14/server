@@ -99,7 +99,6 @@ public class GameRoundService {
         }
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
-
         return currentGameRound;
     }
     private Long computeCardCzarId(Game game){
@@ -107,7 +106,6 @@ public class GameRoundService {
         int currentGameRoundIndex=game.getCurrentGameRoundIndex();
         int nextCardCzarPos=(currentGameRoundIndex-1)%4;
         return game.getPlayerIds().get(nextCardCzarPos);
-
     }
     public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
         User userByToken=userRepository.findByToken(token);
@@ -121,8 +119,6 @@ public class GameRoundService {
         if(currentGameRound.getCardAndPlayerIds().containsValue(userByToken.getUserId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "player already played a card!");
         }
-
-
 
         List<Card>currentCardsOnHand=currentPlayer.getCardsOnHands();
         Card playedCard=cardRepository.findByCardId(cardId);
@@ -143,7 +139,6 @@ public class GameRoundService {
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
         playerRepository.saveAndFlush(currentPlayer);
-
         return currentGameRound;
 
     }
