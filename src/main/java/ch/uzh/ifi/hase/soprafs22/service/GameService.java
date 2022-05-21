@@ -80,7 +80,7 @@ public class GameService {
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
-        if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null){
+        if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Player already joined another game.");
         }
         Game game = new Game();
@@ -93,6 +93,9 @@ public class GameService {
         game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
+        System.out.println("GAMEID: "+game.getGameId());
+        User user = userRepository.findByToken(token);   // from DIEGO
+        user.setCurrentGameId(game.getGameId());   // from DIEGO
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(token);
         addPlayerToGame(adminPlayer,game);
@@ -105,7 +108,7 @@ public class GameService {
     }
 
     private void addPlayerToGame(Player playerToAdd, Game game){
-        if (game.getNumOfPlayersJoined() < 4){
+        if (game.getNumOfPlayersJoined() < 4) {
             List<Long> players = game.getPlayerIds();
             players.add(playerToAdd.getPlayerId());
             game.setPlayerIds(players);
@@ -113,9 +116,7 @@ public class GameService {
             currentPlayerNames.add(playerToAdd.getPlayerName());
             game.setPlayerNames(currentPlayerNames);
             game.setNumOfPlayersJoined(game.getPlayerIds().size());
-        }
-
-        else{
+        } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
 
@@ -140,8 +141,9 @@ public class GameService {
     public Game joinGame(Long gameId, String token){
         Game game = this.getGame(gameId);
         User userToJoin = userRepository.findByToken(token);
-        if (userToJoin.getStatus() == UserStatus.ONLINE){
+        if (userToJoin.getStatus() == UserStatus.ONLINE) {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
+                userToJoin.setCurrentGameId(gameId);   // from DIEGO
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
                 gameRepository.saveAndFlush(game);
@@ -207,6 +209,7 @@ public class GameService {
     public void leaveGame(Long gameId, String token) { //frontend knows the winner -->
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
+        userToRemove.setCurrentGameId(0L);   // from DIEGO
 
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))

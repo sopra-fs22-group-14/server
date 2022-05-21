@@ -29,6 +29,7 @@ public class GameRoundController {
     @ResponseBody
     public GameRoundGetDTO playWhiteCard(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         gameService.isInGame(token,gameRoundPostDTO.getGameId());
         GameRound requestedGameRound=gameRoundService.playCard(gameRoundId,token,gameRoundPostDTO.getCardId(),gameRoundPostDTO.getGameId(),gameRoundPostDTO.getCurrentCombination());
         return DTOMapper.INSTANCE.convertEntityToGameRoundGetDTO(requestedGameRound);
@@ -39,6 +40,7 @@ public class GameRoundController {
     @ResponseBody
     public void chooseRoundWinner(@RequestHeader("Authorization") String token, @RequestBody GameRoundPostDTO gameRoundPostDTO,@PathVariable Long gameRoundId){
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         gameService.isInGame(token,gameRoundPostDTO.getGameId());
         gameRoundService.pickWinner(gameRoundPostDTO.getGameId(),gameRoundId,token,gameRoundPostDTO.getCardId());
     }

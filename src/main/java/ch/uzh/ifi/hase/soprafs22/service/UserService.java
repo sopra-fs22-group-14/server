@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,15 +32,19 @@ import java.util.UUID;
  */
 @Service
 @Transactional
+@Configuration
+@EnableScheduling
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final GameService gameService;
 
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService) {
         this.userRepository = userRepository;
+        this.gameService = gameService;
     }
 
 
@@ -185,5 +192,27 @@ public class UserService {
         return userByToken;
     }
 
+    public void updateLastSeen(String token) {
+        User user = userRepository.findByToken(token);
+        user.setLastSeen(new Date());
+    }
 
+    @Scheduled(fixedDelay = 20000)
+    public void ensureAvailability() {
+        long requestTimeout = 20 * 1000; // 20s in ms
+        for (User user : this.getUsers()) {
+            // Only consider Users that are ONLINE
+            if (user.getStatus() != UserStatus.ONLINE)
+                return;
+            long diff = new Date().getTime() - user.getLastSeen().getTime();
+            if (diff >= requestTimeout) {
+                // if the user is currently in a game, kick him/her from that game
+                if (!user.getCurrentGameId().equals(0L)) {
+                    this.gameService.leaveGame(user.getCurrentGameId(), user.getToken());
+                }
+                // and then, log him/her out
+                this.logout(user.getToken());
+            }
+        }
+    }
 }
