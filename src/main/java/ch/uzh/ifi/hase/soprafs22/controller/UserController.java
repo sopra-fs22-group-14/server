@@ -96,20 +96,20 @@ public class UserController {
         userService.checkIfAuthorized(token);
         userService.checkIfTokenMatchesUserId(token, userId);
         User changedUser = userService.changeUserPassword(token, userPasswordPutDTO.getOldPassword(), userPasswordPutDTO.getNewPassword());
-        return DTOMapper.INSTANCE.convertEntityToUserPasswordGetDTO(changedUser);
+        return DTOMapper.INSTANCE .convertEntityToUserPasswordGetDTO(changedUser);
     }
 
     @PostMapping("users/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public UserLoginDTO logout(@RequestHeader("Authorization") String token) {
+    public void logout(@RequestHeader("Authorization") String token) {
         // return same things as in registration
         // ! logout token sent via header
-        // TODO set token to empty string on logout
+        // TODO set new Token when logging out
         //System.out.println("TOKEN: "+token);
         userService.checkIfAuthorized(token);
         User userByToken=userService.logout(token);
-        return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(userByToken);
+        //return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(userByToken);
     }
 
 }

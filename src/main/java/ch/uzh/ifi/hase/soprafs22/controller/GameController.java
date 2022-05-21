@@ -83,7 +83,15 @@ public class GameController {
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         Game newGame = gameService.createNewGame(gameInput,token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(newGame);
+    }
 
+    @PostMapping("/combinations")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void saveCombination(@RequestHeader("Authorization") String token,@RequestBody CombinationPostDTO combinationPostDTO){
+        userService.checkIfAuthorized(token);
+        userService.checkIfTokenMatchesUserId(token, combinationPostDTO.getPlayerId());
+        gameService.saveBestCombination(combinationPostDTO.getBestCombination(), combinationPostDTO.getPlayerId());
     }
 
 
@@ -135,8 +143,9 @@ public class GameController {
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
         gameService.leaveGame(gameId, token);
-
     }
+
+
 
     @GetMapping("/player")
     @ResponseStatus(HttpStatus.OK)

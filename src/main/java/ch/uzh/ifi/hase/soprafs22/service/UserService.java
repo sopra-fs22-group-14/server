@@ -76,10 +76,12 @@ public class UserService {
         return userById;
     }
 
-
-    /** PRODUCTION READY*/
-    /** SZYMON */
     public User createUser(User newUser) {
+        String usernameToBeSet = newUser.getUsername();
+        String passwordToBeSet=newUser.getPassword();
+        if(usernameToBeSet==null ||usernameToBeSet.trim().isEmpty() || passwordToBeSet.trim().isEmpty() || passwordToBeSet==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
+        }
         String newToken = generateUniqueToken();
         newUser.setToken(newToken);
         newUser.setStatus(UserStatus.ONLINE);
@@ -88,7 +90,6 @@ public class UserService {
         newUser.setTotalGameWon(0);
         newUser.setTimesPicked(0);
         checkIfUserExists(newUser);
-
         // saves the given entity but data is only persisted in the database once
         // flush() is called
         newUser = userRepository.save(newUser); //saving in memory
@@ -110,8 +111,6 @@ public class UserService {
         }
         return newToken;
     }
-
-
 
     private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
@@ -167,7 +166,6 @@ public class UserService {
         } else if ( (newPassword == null || newPassword.trim().isEmpty())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the password.");
         }
-
         requestedUser.setPassword(newPassword);
         String newToken=generateUniqueToken();
         requestedUser.setToken(newToken);
@@ -181,8 +179,8 @@ public class UserService {
         }
         userByToken.setStatus(UserStatus.OFFLINE);
         // TODO test logout with randomToken
-        //String randomToken = generateUniqueToken();
-        //userByToken.setToken(randomToken);
+        String randomToken = generateUniqueToken();
+        userByToken.setToken(randomToken);
         userRepository.saveAndFlush(userByToken);
         return userByToken;
     }
