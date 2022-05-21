@@ -27,9 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -287,12 +285,69 @@ public class GameControllerTest {
                 .header("Authorization","currenttoken");
         mockMvc.perform(getRequest).andExpect(status().isOk());
 
+    }
+    @Test
+    void givenGames_whenGetGameRoundWithPlayedCards_thenReturnJsonArray() throws Exception{
+        testPlayer=new Player();
+        testPlayer.setPlayerId(1L);
+        testPlayer.setPlayerName("testUsername");
+        testPlayer.setPlaying(true);
+        testPlayer.setCardCzar(false);
+        GameRound testRound=new GameRound();
+        testRound.setRoundId(1L);
+        testRound.setCardCzarId(1L);
+        Game testGame=new Game();
+        testGame.setGameId(2L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        Card testCard=new Card();
+        testCard.setCardId(4L);
+        testCard.setCardText("testCard");
+        testCard.setGameEdition("family");
+        testCard.setDeckId(5L);
+        testCard.setWhite(true);
+        testCard.setPlayed(false);
+        testCard.setCanBeChoosen(true);
+        List<Card> currentPlayedCards=new ArrayList<>();
+        currentPlayedCards.add(testCard);
+        testRound.setPlayedCards(currentPlayedCards);
+        Map<Long,Long> testCardAndPlayerIds=new HashMap<>();
+        testCardAndPlayerIds.put(4L,1L);
+        testRound.setCardAndPlayerIds(testCardAndPlayerIds);
+        given(gameService.getGameRound(anyLong())).willReturn(testRound);
+        given(gameService.getGame(anyLong())).willReturn(testGame);
+        given(gameService.getPlayer(Mockito.anyString())).willReturn(testPlayer);
+        given(gameService.getCard(Mockito.anyLong())).willReturn(testCard);
+        MockHttpServletRequestBuilder getRequest = get(String.format("/%s/gameround", testGame.getGameId())).contentType(MediaType.APPLICATION_JSON). header("Authorization","currenttoken");
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.roundId", is(testRound.getRoundId().intValue())))
+                .andExpect(jsonPath("$.cardCzarId", is(testRound.getCardCzarId().intValue())));
 
     }
 
+    @Test
+    public void saveCombination() throws Exception{
+        List<String> combinations = new ArrayList<>();
+        combinations.add("abcd");
+        combinations.add("efgh");
 
+        Player player = new Player();
+        player.setPlayerId(1L);
+        player.setPlayedCombinations(combinations);
 
+        doNothing().when(gameService).saveBestCombination(Mockito.anyString(), Mockito.anyLong());
 
+        MockHttpServletRequestBuilder postRequest = post(String.format("/combinations"))
+                .contentType(MediaType.APPLICATION_JSON).content(asJsonString(player))
+                .header("Authorization", "testToken");
+
+        mockMvc.perform(postRequest).andExpect(status().isOk());
+
+    }
 
 
     private String asJsonString(final Object object) {
