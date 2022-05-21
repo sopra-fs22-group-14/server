@@ -363,6 +363,13 @@ public class GameServiceTest {
         GameRound foundGameRound=gameService.getGameRound(testGame.getGameId());
         assertEquals(foundGameRound.getRoundId(),testRound.getRoundId());
     }
+    @Test
+    public void leavaGame_success(){
+        Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
+        Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+        Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
+        gameService.leaveGame(testGame.getGameId(),"testToken");
+    }
 
 
 
