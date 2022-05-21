@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.UserProfileGetDTO;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,8 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * UserControllerTest
@@ -147,6 +147,31 @@ public class UserControllerTest {
 
         // then
         mockMvc.perform(postRequest).andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void getUserProfile() throws Exception{
+      User user = new User();
+      user.setUserId(1L);
+      user.setUsername("testUsername");
+      //user.setPassword("testPassword");
+      user.setToken("testToken");
+      user.setBirthday(null);
+
+      UserProfileGetDTO userProfileGetDTO = new UserProfileGetDTO();
+      userProfileGetDTO.setBirthday(null);
+      userProfileGetDTO.setUsername("tester");
+
+      given(userService.getUser(Mockito.anyString())).willReturn(user);
+
+      MockHttpServletRequestBuilder getRequest = get(String.format("/users/%s", user.getUserId())).contentType(MediaType.APPLICATION_JSON)
+              .header("Authorization", "testToken");
+
+      mockMvc.perform(getRequest).andExpect(status().isOk())
+              .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+              .andExpect(jsonPath("$.username", is(user.getUsername())))
+              .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
     }
 
 
