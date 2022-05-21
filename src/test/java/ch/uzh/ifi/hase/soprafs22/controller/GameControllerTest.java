@@ -287,12 +287,27 @@ public class GameControllerTest {
                 .header("Authorization","currenttoken");
         mockMvc.perform(getRequest).andExpect(status().isOk());
 
-
     }
 
+    @Test
+    public void saveCombination() throws Exception{
+        List<String> combinations = new ArrayList<>();
+        combinations.add("abcd");
+        combinations.add("efgh");
 
+        Player player = new Player();
+        player.setPlayerId(1L);
+        player.setPlayedCombinations(combinations);
 
+        doNothing().when(gameService).saveBestCombination(Mockito.anyString(), Mockito.anyLong());
 
+        MockHttpServletRequestBuilder postRequest = post(String.format("/combinations"))
+                .contentType(MediaType.APPLICATION_JSON).content(asJsonString(player))
+                .header("Authorization", "testToken");
+
+        mockMvc.perform(postRequest).andExpect(status().isOk());
+
+    }
 
 
     private String asJsonString(final Object object) {

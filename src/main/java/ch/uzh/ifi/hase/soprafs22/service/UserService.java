@@ -172,7 +172,7 @@ public class UserService {
         return requestedUser;
     }
 
-    public User logout(String token) {
+    public void logout(String token) {
         User userByToken=userRepository.findByToken(token);
         if (userByToken == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given token was not found.");
@@ -182,7 +182,7 @@ public class UserService {
         String randomToken = generateUniqueToken();
         userByToken.setToken(randomToken);
         userRepository.saveAndFlush(userByToken);
-        return userByToken;
+        //return userByToken;
     }
 
 

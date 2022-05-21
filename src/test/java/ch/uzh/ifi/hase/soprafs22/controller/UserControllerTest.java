@@ -2,9 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.controller;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserLoginDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserProfileGetDTO;
+import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,16 +17,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
@@ -200,8 +199,76 @@ public class UserControllerTest {
               .andExpect(jsonPath("$.timesPicked", is(user.getTimesPicked())))
               .andExpect(jsonPath("$.totalGameWon", is(user.getTotalGameWon())))
               .andExpect(jsonPath("$.bestCombinations", is(user.getBestCombinations())));
+    }
+
+    @Test
+    public void changeUserProfile() throws Exception{
+      User user = new User();
+      user.setUserId(1L);
+      user.setUsername("testUsername");
+      user.setToken("testToken");
+      user.setBirthday(null);
+      user.setPassword("testPassword");
+
+      UserProfilePutDTO userProfilePutDTO = new UserProfilePutDTO();
+      userProfilePutDTO.setUsername("changeTestUsername");
+
+      doNothing().when(userService).changeUserProfile(Mockito.anyString(),Mockito.anyString(),Mockito.any(),Mockito.anyString());
+
+      MockHttpServletRequestBuilder putRequest = put(String.format("/users/%s", user.getUserId()))
+              .contentType(MediaType.APPLICATION_JSON).content(asJsonString(userProfilePutDTO))
+              .header("Authorization", "testToken");
+
+      mockMvc.perform(putRequest).andExpect(status().isNoContent());
+    }
+
+//    @Test
+//    public void changeUserPassword() throws Exception{
+//        User user = new User();
+//        user.setUserId(1L);
+//        user.setToken("testToken");
+//        user.setUsername("testUsername");
+//        user.setPassword("testPassword");
+//
+//        UserPasswordPutDTO userPasswordPutDTO = new UserPasswordPutDTO();
+//        userPasswordPutDTO.setOldPassword("testPassword");
+//        userPasswordPutDTO.setNewPassword("testNewPassword");
+//
+//        UserPasswordGetDTO userPasswordGetDTO = new UserPasswordGetDTO();
+//        userPasswordGetDTO.setToken("testNewToken");
+//
+//        given(userService.changeUserPassword(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(user);
+//
+//        MockHttpServletRequestBuilder getRequest = put(String.format("/users/%s/password", user.getUserId()))
+//                .contentType(MediaType.APPLICATION_JSON).content(asJsonString(userPasswordPutDTO))
+//                .header("Authorization", "testToken");
+//
+//        mockMvc.perform(getRequest).andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(jsonPath("$.token", is(userPasswordGetDTO.getToken())));
+//    }
+
+    @Test
+    public void logout() throws Exception{
+      User user = new User();
+      user.setUserId(1L);
+      user.setUsername("testUsername");
+      user.setToken("testToken");
+      user.setPassword("testPassword");
+
+      doNothing().when(userService).logout(Mockito.anyString());
+
+      MockHttpServletRequestBuilder postRequest = post(String.format("/users/logout"))
+              .contentType(MediaType.APPLICATION_JSON)
+              .header("Authorization", "testToken");
+
+      mockMvc.perform(postRequest).andExpect(status().isNoContent());
 
     }
+
+
+
+
 
 
 
