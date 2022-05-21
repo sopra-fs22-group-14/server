@@ -76,9 +76,6 @@ public class UserService {
         return userById;
     }
 
-
-    /** PRODUCTION READY*/
-    /** SZYMON */
     public User createUser(User newUser) {
         String usernameToBeSet = newUser.getUsername();
         String passwordToBeSet=newUser.getPassword();

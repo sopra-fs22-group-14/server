@@ -74,6 +74,9 @@ public class GameService {
     }
 
     public Game createNewGame(Game gameInput,String token) {
+        if ((gameInput.getGameName() == null || gameInput.getGameName().trim().isEmpty())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the password.");
+        }
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
@@ -219,6 +222,12 @@ public class GameService {
             //deleteGame(gameToLeave); //--> call this function and delete the below 2 lines
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
+//            Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
+//            List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
+//            cardRepository.deleteAll(cardsToBeDeleted);
+//            cardRepository.flush();
+//            deckRepository.delete(deckToBeDeleted);
+//            deckRepository.flush();
         }
     }
 
