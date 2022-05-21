@@ -169,6 +169,7 @@ public class UserService {
         requestedUser.setPassword(newPassword);
         String newToken=generateUniqueToken();
         requestedUser.setToken(newToken);
+        userRepository.saveAndFlush(requestedUser);
         return requestedUser;
     }
 
