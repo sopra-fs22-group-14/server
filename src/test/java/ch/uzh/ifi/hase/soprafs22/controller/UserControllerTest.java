@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -155,23 +156,51 @@ public class UserControllerTest {
       User user = new User();
       user.setUserId(1L);
       user.setUsername("testUsername");
-      //user.setPassword("testPassword");
       user.setToken("testToken");
       user.setBirthday(null);
 
-      UserProfileGetDTO userProfileGetDTO = new UserProfileGetDTO();
-      userProfileGetDTO.setBirthday(null);
-      userProfileGetDTO.setUsername("tester");
-
       given(userService.getUser(Mockito.anyString())).willReturn(user);
 
-      MockHttpServletRequestBuilder getRequest = get(String.format("/users/%s", user.getUserId())).contentType(MediaType.APPLICATION_JSON)
+      MockHttpServletRequestBuilder getRequest = get(String.format("/users/%s", user.getUserId()))
+              .contentType(MediaType.APPLICATION_JSON)
               .header("Authorization", "testToken");
 
       mockMvc.perform(getRequest).andExpect(status().isOk())
               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
               .andExpect(jsonPath("$.username", is(user.getUsername())))
               .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
+    }
+
+    @Test
+    public void getUserRecords() throws Exception{
+
+      List<String> combinations = new ArrayList<>();
+      combinations.add("abcd");
+      combinations.add("efgh");
+
+      User user = new User();
+      user.setUserId(1L);
+      user.setToken("testToken");
+      user.setUsername("testUsername");
+      user.setTotalRoundWon(10);
+      user.setTimesPicked(8);
+      user.setTotalGameWon(5);
+      user.setBestCombinations(combinations);
+
+      given(userService.getUserRecords(Mockito.any())).willReturn(user);
+
+      MockHttpServletRequestBuilder getRequest = get(String.format("/users/%s/records", user.getUserId()))
+              .contentType(MediaType.APPLICATION_JSON)
+              .header("Authorization", "testToken");
+
+      mockMvc.perform(getRequest).andExpect(status().isOk())
+              .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+              .andExpect(jsonPath("$.username", is(user.getUsername())))
+              .andExpect(jsonPath("$.totalRoundWon", is(user.getTotalRoundWon())))
+              .andExpect(jsonPath("$.timesPicked", is(user.getTimesPicked())))
+              .andExpect(jsonPath("$.totalGameWon", is(user.getTotalGameWon())))
+              .andExpect(jsonPath("$.bestCombinations", is(user.getBestCombinations())));
+
     }
 
 
