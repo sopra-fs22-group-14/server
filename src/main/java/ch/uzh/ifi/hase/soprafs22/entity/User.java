@@ -58,14 +58,14 @@ public class User implements Serializable {
     @Column(nullable = false)
     private Date creationDate;
 
-    @Column(nullable = false)
-    private int totalGamePlayed;
+    //@Column(nullable = false)
+    //private int totalGamePlayed;
 
     @Column(nullable = false)
     private int totalGameWon;
 
-    @Column(nullable = false)
-    private int totalRoundPlayed;
+    //@Column(nullable = false)
+    //private int totalRoundPlayed;
 
     @Column(nullable = false)
     private int totalRoundWon;

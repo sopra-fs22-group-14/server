@@ -83,7 +83,7 @@ public class UserController {
     @PutMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void changeUserProfile(@RequestHeader("Authorization") String token, @PathVariable long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
+    public void changeUserProfile(@RequestHeader("Authorization") String token , @PathVariable long userId, @RequestBody UserProfilePutDTO userProfilePutDTO){
         userService.checkIfAuthorized(token);
         userService.checkIfTokenMatchesUserId(token, userId);
         userService.changeUserProfile(token, userProfilePutDTO.getUsername(), userProfilePutDTO.getBirthday(), userProfilePutDTO.getPassword());
@@ -103,12 +103,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void logout(@RequestHeader("Authorization") String token) {
-        // return same things as in registration
-        // ! logout token sent via header
         // TODO set new Token when logging out
         //System.out.println("TOKEN: "+token);
         userService.checkIfAuthorized(token);
-        User userByToken=userService.logout(token);
+        userService.logout(token);
+        //User userByToken=userService.logout(token);
         //return DTOMapper.INSTANCE.convertEntityToUserLoginDTO(userByToken);
     }
 
