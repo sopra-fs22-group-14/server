@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Entity
 @Table(name = "GAMEROUND")
-public class GameRound {
+public class GameRound implements Serializable {
 
     @Id
     @GeneratedValue
@@ -59,6 +60,10 @@ public class GameRound {
 
     @Column
     private boolean isFinal;
+
+    @Column
+    @ElementCollection
+    private List<String> playedPlayerNames=new ArrayList<>();
 
 
     //@Column(nullable = false, unique=true)
