@@ -265,6 +265,19 @@ public class GameService {
         return player;
     }
 
+    public void saveBestCombination(String bestCombination, Long playerId){
+        Player requestedPlayer = playerRepository.findByPlayerId(playerId);
+        List<String> requestedPlayerCombinations = requestedPlayer.getPlayedCombinations();
+        User correspondingUser = userRepository.findByUserId(playerId);
+        if(requestedPlayerCombinations.contains(bestCombination)){
+            //requestedPlayerCombinations.add(bestCombination);
+            correspondingUser.getBestCombinations().add(bestCombination);
+        } else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Your chosen combination was not found in the List of combination");
+        }
+        userRepository.saveAndFlush(correspondingUser);
+    }
+
     public Deck createDeck(String gameEdition) {
 
         Deck d = new Deck();
