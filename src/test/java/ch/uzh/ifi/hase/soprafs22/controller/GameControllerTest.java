@@ -312,6 +312,9 @@ public class GameControllerTest {
         testCard.setWhite(true);
         testCard.setPlayed(false);
         testCard.setCanBeChoosen(true);
+        List<Card> currentPlayedCards=new ArrayList<>();
+        currentPlayedCards.add(testCard);
+        testRound.setPlayedCards(currentPlayedCards);
         Map<Long,Long> testCardAndPlayerIds=new HashMap<>();
         testCardAndPlayerIds.put(4L,1L);
         testRound.setCardAndPlayerIds(testCardAndPlayerIds);
