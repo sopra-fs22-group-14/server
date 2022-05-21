@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs22.controller;
 
 
 
+import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.*;
 import ch.uzh.ifi.hase.soprafs22.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.*;
@@ -246,6 +247,46 @@ public class GameControllerTest {
                 .andExpect(jsonPath("$.gameId", is(testGame.getGameId().intValue())))
                 .andExpect(jsonPath("$.gameName", is(testGame.getGameName())))
                 .andExpect(jsonPath("$.numOfPlayersJoined", is(testGame.getNumOfPlayersJoined())));
+
+    }
+    @Test
+    void givenGames_whenGetGame_thenReturnGameGetDTO() throws Exception{
+        User testUser = new User();
+        testUser.setUserId(1L);
+        testUser.setUsername("testUsername");
+        testUser.setPassword("TestPassword");
+        testUser.setToken("currenttoken");
+        testUser.setStatus(UserStatus.ONLINE);
+        Game testGame=new Game();
+        testGame.setGameId(2L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        given(gameService.getGame(anyLong())).willReturn(testGame);
+        given(userService.getUser("currenttoken")).willReturn(testUser);
+        MockHttpServletRequestBuilder getRequest = get(String.format("/games/%s",testGame.getGameId())).contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization","currenttoken");
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.gameId", is(testGame.getGameId().intValue())));
+
+    }
+    @Test
+    void givenGame_whenGetGameSummary_thenReturnGameSummaryGetDTO() throws Exception{
+        Game testGame=new Game();
+        testGame.setGameId(2L);
+        testGame.setGameName("abc");
+        testGame.setNumOfPlayersJoined(2);
+        testGame.setCardCzarMode(false);
+        testGame.setNumOfRounds(16);
+        testGame.setGameEdition("family");
+        given(gameService.getGameSummaryAndWinner(anyLong())).willReturn(testGame);
+        MockHttpServletRequestBuilder getRequest=get(String.format("/%s/gameEnd",testGame.getGameId())).contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization","currenttoken");
+        mockMvc.perform(getRequest).andExpect(status().isOk());
+
 
     }
 
