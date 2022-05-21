@@ -136,6 +136,9 @@ public class GameRoundService {
         List<String> currentPlayedCombinations=currentPlayer.getPlayedCombinations();
         currentPlayedCombinations.add(currentCombination);
         currentPlayer.setPlayedCombinations(currentPlayedCombinations);
+        List<String> currentPlayedPlayerNames=currentGameRound.getPlayedPlayerNames();
+        currentPlayedPlayerNames.add(currentPlayer.getPlayerName());
+        currentGameRound.setPlayedPlayerNames(currentPlayedPlayerNames);
         currentGameRound=gameRoundRepository.save(currentGameRound);
         gameRoundRepository.flush();
         playerRepository.saveAndFlush(currentPlayer);
