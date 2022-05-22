@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +21,6 @@ import java.util.*;
 @Service
 @Transactional
 public class GameService {
-
-    private Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
     private final GameRoundRepository gameRoundRepository;
@@ -120,7 +116,6 @@ public class GameService {
     }
 
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
-        //TODO store the performance of the Player in User for Stats and delete the Player
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
@@ -402,7 +397,6 @@ public class GameService {
         game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
         game.setWinnersIds(winnersIds);
         game.setWinnersNames(winnersNames);
-        //TODO send records from Player to User
         return game;
     }
     public Card getCard(Long cardId){

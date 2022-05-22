@@ -206,7 +206,6 @@ public class GameRoundService {
 
     public void pickCard(Long gameRoundId,String token,Long cardId){
         User userByToken=userRepository.findByToken(token);
-        //TODO check if he picked before
         Player playerToPick=playerRepository.findByPlayerId(userByToken.getUserId());
         if(playerToPick.isHasPicked()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "player already picked");

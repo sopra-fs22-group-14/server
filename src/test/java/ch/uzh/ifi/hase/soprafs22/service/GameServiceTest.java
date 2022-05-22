@@ -354,8 +354,6 @@ public class GameServiceTest {
 
     }
 
-
-
     @Test
     public void getGameRound_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -370,13 +368,6 @@ public class GameServiceTest {
         Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
         gameService.leaveGame(testGame.getGameId(),"testToken");
     }
-
-
-
-
-
-
-
 
 
 }

@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs22.rest.dto;
-import lombok.AllArgsConstructor;
+//import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class UserLoginDTO {
     private Long id;
     private String token;
