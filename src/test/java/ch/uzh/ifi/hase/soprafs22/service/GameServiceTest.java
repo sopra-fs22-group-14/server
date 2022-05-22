@@ -368,6 +368,13 @@ public class GameServiceTest {
         Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
         gameService.leaveGame(testGame.getGameId(),"testToken");
     }
+    @Test
+    public void joinableGames_success(){
+        List<Game> testJoinableGames=new ArrayList<>();
+        testJoinableGames.add(testGame);
+        Mockito.when(gameRepository.findAll()).thenReturn(testJoinableGames);
+        List<Game> foundGames=gameService.joinableGames();
+    }
 
 
 }
