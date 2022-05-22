@@ -107,7 +107,7 @@ public class GameRoundService {
         int nextCardCzarPos=(currentGameRoundIndex-1)%4;
         return game.getPlayerIds().get(nextCardCzarPos);
     }
-    public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
+    public synchronized GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
         User userByToken=userRepository.findByToken(token);
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
         Game currentGame=gameRepository.findByGameId(gameId);
@@ -146,7 +146,7 @@ public class GameRoundService {
 
     }
 
-    public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
+    public synchronized void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
         Game requestedGame=gameRepository.findByGameId(gameId);
         if (requestedGame.isCardCzarMode()) {
             String roundWinner = chooseRoundWinner(gameRoundId, token, cardId);
