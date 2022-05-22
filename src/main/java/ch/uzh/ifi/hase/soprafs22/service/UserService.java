@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
@@ -39,17 +41,16 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
     private final GameService gameService;
 
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService, PlayerRepository playerRepository) {
         this.userRepository = userRepository;
         this.gameService = gameService;
+        this.playerRepository = playerRepository;
     }
 
-
-
-    /** INITIAL SKETCH FOR CHECKING AUTHORIZATION */
     public void checkIfAuthorized(String token){
         User userByToken=userRepository.findByToken(token);
         if (userByToken == null) {
@@ -198,21 +199,32 @@ public class UserService {
         user.setLastSeen(new Date());
     }
 
-    @Scheduled(fixedDelay = 20000)
+    public void updateLastGameRequest(String token) {
+        User user = userRepository.findByToken(token);
+        user.setLastGameRequest(new Date());
+    }
+
+
+    @Scheduled(fixedDelay = 10000)
     public void ensureAvailability() {
-        long requestTimeout = 20 * 1000; // 20s in ms
+        long requestTimeout = 60000; // 60s
+        long gameTimeout = 20000; // 20s
         for (User user : this.getUsers()) {
-            // Only consider Users that are ONLINE
-            if (user.getStatus() != UserStatus.ONLINE)
-                return;
-            long diff = new Date().getTime() - user.getLastSeen().getTime();
-            if (diff >= requestTimeout) {
+            if (user.getStatus() != UserStatus.ONLINE) return;
+            long diffLastSeen = new Date().getTime() - user.getLastSeen().getTime();
+            long diffLastGameRequest = new Date().getTime() - user.getLastGameRequest().getTime();
+            Player player = playerRepository.findByPlayerId(user.getUserId());
+
+            // User did not make any request in the given threshold
+            if (diffLastSeen >= requestTimeout) {
                 // if the user is currently in a game, kick him/her from that game
-                if (!user.getCurrentGameId().equals(0L)) {
-                    this.gameService.leaveGame(user.getCurrentGameId(), user.getToken());
-                }
-                // and then, log him/her out
-                this.logout(user.getToken());
+                if (player != null)
+                    this.gameService.leaveGame(player.getCurrentGameId(), user.getToken());
+                this.logout(user.getToken());   // and then, log him/her out
+
+            } else if (player != null && diffLastGameRequest >= gameTimeout) {
+                // if the user is in a game, ensure he didn't just go to another page
+                this.gameService.leaveGame(player.getCurrentGameId(), user.getToken());
             }
         }
     }

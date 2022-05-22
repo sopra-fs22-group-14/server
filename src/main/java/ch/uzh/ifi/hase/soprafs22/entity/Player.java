@@ -49,11 +49,11 @@ public class Player implements Serializable {
     @ElementCollection
     private List<String> playedCombinations=new ArrayList<>();
 
+    @Column
+    private Long currentGameId = 0L;
+
     //@Column(nullable = false)
     //@ElementCollection
     //private List<String> CombinationsOfGame=new ArrayList<String>();
-
-
-
 
 }

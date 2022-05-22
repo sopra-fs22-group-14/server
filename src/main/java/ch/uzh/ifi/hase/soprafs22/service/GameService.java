@@ -93,9 +93,6 @@ public class GameService {
         game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
-        System.out.println("GAMEID: "+game.getGameId());
-        User user = userRepository.findByToken(token);   // from DIEGO
-        user.setCurrentGameId(game.getGameId());   // from DIEGO
         // admin player is the one who creates game
         Player adminPlayer = createPlayer(token);
         addPlayerToGame(adminPlayer,game);
@@ -103,6 +100,9 @@ public class GameService {
         Deck d=createDeck(game.getGameEdition());
         game.setDeckID(d.getDeckId());
         game = gameRepository.saveAndFlush(game);
+
+        adminPlayer.setCurrentGameId(game.getGameId());   // from DIEGO
+        playerRepository.saveAndFlush(adminPlayer);   // from DIEGO
 
         return game;
     }
@@ -143,10 +143,11 @@ public class GameService {
         User userToJoin = userRepository.findByToken(token);
         if (userToJoin.getStatus() == UserStatus.ONLINE) {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
-                userToJoin.setCurrentGameId(gameId);   // from DIEGO
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
                 gameRepository.saveAndFlush(game);
+                player.setCurrentGameId(game.getGameId());   // from DIEGO
+                playerRepository.saveAndFlush(player);   // from DIEGO
                 // if the lobby is full, start the game
                 if (game.getNumOfPlayersJoined() == 4) {
                     game.setActive(true);
@@ -209,7 +210,9 @@ public class GameService {
     public void leaveGame(Long gameId, String token) { //frontend knows the winner -->
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
-        userToRemove.setCurrentGameId(0L);   // from DIEGO
+        Player playerToRemove = playerRepository.findByPlayerId(userToRemove.getUserId());   // from DIEGO
+        playerToRemove.setCurrentGameId(0L);   // from DIEGO
+        playerRepository.saveAndFlush(playerToRemove);   // from DIEGO
 
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))

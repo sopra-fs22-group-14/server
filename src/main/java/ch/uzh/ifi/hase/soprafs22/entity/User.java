@@ -77,9 +77,9 @@ public class User implements Serializable {
     private List<String> bestCombinations=new ArrayList<>();
 
     @Column(nullable = false)
-    private Date lastSeen = new Date();
+    private Date lastGameRequest = new Date();
 
-    @Column
-    private Long currentGameId;
+    @Column(nullable = false)
+    private Date lastSeen = new Date();
 
 }
