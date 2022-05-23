@@ -32,7 +32,7 @@ public class UserServiceTest {
     testUser.setUserId(1L);
     testUser.setUsername("testUsername");
     testUser.setPassword("testPassword");
-
+    testUser.setToken("testToken");
 
     // when -> any object is being save in the userRepository -> return the dummy
     // testUser
