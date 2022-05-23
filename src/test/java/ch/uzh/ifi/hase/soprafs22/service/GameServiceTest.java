@@ -122,9 +122,6 @@ public class GameServiceTest {
         testPlayer4.setPlaying(true);
         testPlayer4.setCardCzar(false);
 
-
-
-
         testGame=new Game();
         testGame.setGameId(3L);
         testGame.setGameName("testGame");

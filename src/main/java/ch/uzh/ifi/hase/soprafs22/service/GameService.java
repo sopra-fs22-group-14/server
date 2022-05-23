@@ -71,7 +71,7 @@ public class GameService {
 
     public Game createNewGame(Game gameInput,String token) {
         if ((gameInput.getGameName() == null || gameInput.getGameName().trim().isEmpty())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the password.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify a game name.");
         }
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
