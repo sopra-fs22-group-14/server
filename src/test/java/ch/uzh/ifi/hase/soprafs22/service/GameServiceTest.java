@@ -375,6 +375,27 @@ public class GameServiceTest {
         Mockito.when(gameRepository.findAll()).thenReturn(testJoinableGames);
         List<Game> foundGames=gameService.joinableGames();
     }
+    @Test
+    public void saveBestCombination_success(){
+        List<String> testCombinations=new ArrayList<>();
+        testCombinations.add("testCombination");
+        testPlayer.setPlayedCombinations(testCombinations);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        gameService.saveBestCombination("testCombination",testPlayer.getPlayerId());
+    }
+    @Test
+    public void saveBestCombination_throwsException(){
+        List<String> testCombinations=new ArrayList<>();
+        testCombinations.add("testCombination2");
+        testPlayer.setPlayedCombinations(testCombinations);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.saveBestCombination("testCombination",testPlayer.getPlayerId()));
+        String exceptionMessage = "Your chosen combination was not found in the List of combination";
+        assertEquals(exceptionMessage,exception.getReason());
+
+    }
 
 
 }

@@ -11,6 +11,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
@@ -32,6 +34,7 @@ public class UserServiceTest {
     testUser.setUserId(1L);
     testUser.setUsername("testUsername");
     testUser.setPassword("testPassword");
+
 
 
     // when -> any object is being save in the userRepository -> return the dummy
@@ -66,6 +69,48 @@ public class UserServiceTest {
     // then -> attempt to create second user with same user -> check that an error
     // is thrown
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+  }
+
+  @Test
+  public void login_success(){
+      testUser.setToken("testToken");
+      User testInput=new User();
+      testInput.setUsername("testUsername");
+      testInput.setPassword("testPassword");
+      Mockito.when(userRepository.findByUsername("testUsername")).thenReturn(testUser);
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      userService.login(testInput);
+
+  }
+  @Test
+  public void changeUserProfile_success(){
+      Date testBirthday=new Date();
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      userService.changeUserProfile("testToken","testUsername",testBirthday,"testPassword");
+  }
+  @Test
+  public void logout_success(){
+      testUser.setStatus(UserStatus.ONLINE);
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      userService.logout("testToken");
+  }
+  @Test
+  public void getUser_success(){
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      User foundUser=userService.getUser("testToken");
+      assertEquals(foundUser.getUserId(),testUser.getUserId());
+  }
+  @Test
+  public void getUserRecords_success(){
+      Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
+      User foundUser=userService.getUserRecords(testUser.getUserId());
+      assertEquals(foundUser.getUserId(),testUser.getUserId());
+  }
+  @Test
+  public void changeUserPassword_success(){
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      User foundUser=userService.changeUserPassword("testToken","testPassword","testNewPassword");
+      assertEquals(foundUser.getUserId(),testUser.getUserId());
   }
 
   @Test
