@@ -19,4 +19,5 @@ public class GameRoundGetDTO {
     private List<Card> playedCards;
     private boolean isFinal;
     private List<String> playedPlayerNames;
+    private List<String> pickedPlayerNames;
 }

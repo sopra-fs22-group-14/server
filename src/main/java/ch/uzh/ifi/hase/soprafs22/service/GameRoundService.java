@@ -216,6 +216,9 @@ public class GameRoundService {
         int currentNumberOfPicked=currentPlayer.getNumberOfPicked();
         currentPlayer.setNumberOfPicked(currentNumberOfPicked+1);
         playerToPick.setHasPicked(true);
+        List<String> currentPickedPlayerNames=currentGameRound.getPickedPlayerNames();
+        currentPickedPlayerNames.add(playerToPick.getPlayerName());
+        currentGameRound.setPickedPlayerNames(currentPickedPlayerNames);
         playerRepository.save(currentPlayer);
         playerRepository.save(playerToPick);
         playerRepository.flush();
