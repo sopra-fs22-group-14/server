@@ -112,6 +112,16 @@ public class UserServiceTest {
       User foundUser=userService.changeUserPassword("testToken","testPassword","testNewPassword");
       assertEquals(foundUser.getUserId(),testUser.getUserId());
   }
+  @Test
+  public void checkIfAuthorized_success(){
+      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
+      userService.checkIfAuthorized("testToken");
+  }
+  @Test
+  public void checkIfTokenMatchesUserId_success(){
+      Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
+      userService.checkIfTokenMatchesUserId("testToken",testUser.getUserId());
+  }
 
   @Test
   public void createUser_duplicateInputs_throwsException() {
