@@ -108,7 +108,7 @@ public class GameRoundService {
         int nextCardCzarPos=(currentGameRoundIndex-1)%4;
         return game.getPlayerIds().get(nextCardCzarPos);
     }
-    public GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
+    public synchronized GameRound playCard(Long gameRoundId,String token,Long cardId,Long gameId,String currentCombination){
         User userByToken=userRepository.findByToken(token);
         GameRound currentGameRound=gameRoundRepository.findByRoundId(gameRoundId);
         Game currentGame=gameRepository.findByGameId(gameId);
@@ -147,7 +147,7 @@ public class GameRoundService {
 
     }
 
-    public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
+    public synchronized void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
         Game requestedGame=gameRepository.findByGameId(gameId);
         if (requestedGame.isCardCzarMode()) {
             String roundWinner = chooseRoundWinner(gameRoundId, token, cardId);
@@ -207,7 +207,6 @@ public class GameRoundService {
 
     public void pickCard(Long gameRoundId,String token,Long cardId){
         User userByToken=userRepository.findByToken(token);
-        //TODO check if he picked before
         Player playerToPick=playerRepository.findByPlayerId(userByToken.getUserId());
         if(playerToPick.isHasPicked()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "player already picked");
@@ -218,6 +217,9 @@ public class GameRoundService {
         int currentNumberOfPicked=currentPlayer.getNumberOfPicked();
         currentPlayer.setNumberOfPicked(currentNumberOfPicked+1);
         playerToPick.setHasPicked(true);
+        List<String> currentPickedPlayerNames=currentGameRound.getPickedPlayerNames();
+        currentPickedPlayerNames.add(playerToPick.getPlayerName());
+        currentGameRound.setPickedPlayerNames(currentPickedPlayerNames);
         playerRepository.save(currentPlayer);
         playerRepository.save(playerToPick);
         playerRepository.flush();

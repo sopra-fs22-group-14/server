@@ -122,9 +122,6 @@ public class GameServiceTest {
         testPlayer4.setPlaying(true);
         testPlayer4.setCardCzar(false);
 
-
-
-
         testGame=new Game();
         testGame.setGameId(3L);
         testGame.setGameName("testGame");
@@ -354,8 +351,6 @@ public class GameServiceTest {
 
     }
 
-
-
     @Test
     public void getGameRound_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -370,13 +365,34 @@ public class GameServiceTest {
         Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
         gameService.leaveGame(testGame.getGameId(),"testToken");
     }
+    @Test
+    public void joinableGames_success(){
+        List<Game> testJoinableGames=new ArrayList<>();
+        testJoinableGames.add(testGame);
+        Mockito.when(gameRepository.findAll()).thenReturn(testJoinableGames);
+        List<Game> foundGames=gameService.joinableGames();
+    }
+    @Test
+    public void saveBestCombination_success(){
+        List<String> testCombinations=new ArrayList<>();
+        testCombinations.add("testCombination");
+        testPlayer.setPlayedCombinations(testCombinations);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        gameService.saveBestCombination("testCombination",testPlayer.getPlayerId());
+    }
+    @Test
+    public void saveBestCombination_throwsException(){
+        List<String> testCombinations=new ArrayList<>();
+        testCombinations.add("testCombination2");
+        testPlayer.setPlayedCombinations(testCombinations);
+        Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
+        Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.saveBestCombination("testCombination",testPlayer.getPlayerId()));
+        String exceptionMessage = "Your chosen combination was not found in the List of combination";
+        assertEquals(exceptionMessage,exception.getReason());
 
-
-
-
-
-
-
+    }
 
 
 }

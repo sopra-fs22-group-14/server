@@ -65,6 +65,10 @@ public class GameRound implements Serializable {
     @ElementCollection
     private List<String> playedPlayerNames=new ArrayList<>();
 
+    @Column
+    @ElementCollection
+    private List<String> pickedPlayerNames=new ArrayList<>();
+
 
     //@Column(nullable = false, unique=true)
     //@ElementCollection

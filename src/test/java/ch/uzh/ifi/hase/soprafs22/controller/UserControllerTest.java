@@ -222,31 +222,31 @@ public class UserControllerTest {
       mockMvc.perform(putRequest).andExpect(status().isNoContent());
     }
 
-//    @Test
-//    public void changeUserPassword() throws Exception{
-//        User user = new User();
-//        user.setUserId(1L);
-//        user.setToken("testToken");
-//        user.setUsername("testUsername");
-//        user.setPassword("testPassword");
-//
-//        UserPasswordPutDTO userPasswordPutDTO = new UserPasswordPutDTO();
-//        userPasswordPutDTO.setOldPassword("testPassword");
-//        userPasswordPutDTO.setNewPassword("testNewPassword");
-//
-//        UserPasswordGetDTO userPasswordGetDTO = new UserPasswordGetDTO();
-//        userPasswordGetDTO.setToken("testNewToken");
-//
-//        given(userService.changeUserPassword(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(user);
-//
-//        MockHttpServletRequestBuilder getRequest = put(String.format("/users/%s/password", user.getUserId()))
-//                .contentType(MediaType.APPLICATION_JSON).content(asJsonString(userPasswordPutDTO))
-//                .header("Authorization", "testToken");
-//
-//        mockMvc.perform(getRequest).andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(jsonPath("$.token", is(userPasswordGetDTO.getToken())));
-//    }
+    @Test
+    public void changeUserPassword() throws Exception{
+        User user = new User();
+        user.setUserId(1L);
+        user.setToken("testNewToken");
+        user.setUsername("testUsername");
+        user.setPassword("testPassword");
+
+        UserPasswordPutDTO userPasswordPutDTO = new UserPasswordPutDTO();
+        userPasswordPutDTO.setOldPassword("testPassword");
+        userPasswordPutDTO.setNewPassword("testNewPassword");
+
+        UserPasswordGetDTO userPasswordGetDTO = new UserPasswordGetDTO();
+        userPasswordGetDTO.setToken("testNewToken");
+
+        given(userService.changeUserPassword(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(user);
+
+        MockHttpServletRequestBuilder getRequest = put(String.format("/users/%s/password", user.getUserId()))
+                .contentType(MediaType.APPLICATION_JSON).content(asJsonString(userPasswordPutDTO))
+                .header("Authorization", "testToken");
+
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+           .andExpect(jsonPath("$.token", is(userPasswordGetDTO.getToken())));
+    }
 
     @Test
     public void logout() throws Exception{

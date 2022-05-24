@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +21,6 @@ import java.util.*;
 @Service
 @Transactional
 public class GameService {
-
-    private Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
     private final GameRoundRepository gameRoundRepository;
@@ -75,7 +71,7 @@ public class GameService {
 
     public Game createNewGame(Game gameInput,String token) {
         if ((gameInput.getGameName() == null || gameInput.getGameName().trim().isEmpty())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify the password.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify a game name.");
         }
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
@@ -88,9 +84,9 @@ public class GameService {
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
-        //game.setNumOfRounds(gameInput.getNumOfRounds());
+        game.setNumOfRounds(gameInput.getNumOfRounds());
         //TODO set RoundValues back to User input
-        game.setNumOfRounds(4);
+        //game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
         game.setActive(false);
         // admin player is the one who creates game
@@ -121,7 +117,6 @@ public class GameService {
     }
 
     private void removePlayerFromGame(Game gameToLeave, User userToRemove) {
-        //TODO store the performance of the Player in User for Stats and delete the Player
         for (Long playerId : gameToLeave.getPlayerIds()) {
             if (playerId.equals(userToRemove.getUserId())) {
                 gameToLeave.getPlayerIds().remove(playerId);
@@ -408,7 +403,6 @@ public class GameService {
         game.setPlayersNumbersOfPicked(playersNumbersOfPicked);
         game.setWinnersIds(winnersIds);
         game.setWinnersNames(winnersNames);
-        //TODO send records from Player to User
         return game;
     }
     public Card getCard(Long cardId){

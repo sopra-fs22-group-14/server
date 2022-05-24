@@ -5,9 +5,6 @@ import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
 import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -80,14 +76,13 @@ public class UserService {
     }
 
     public User getUserRecords(Long userId){
-        User userById = userRepository.findByUserId(userId);
-        return userById;
+        return userRepository.findByUserId(userId);
     }
 
     public User createUser(User newUser) {
         String usernameToBeSet = newUser.getUsername();
         String passwordToBeSet=newUser.getPassword();
-        if(usernameToBeSet==null ||usernameToBeSet.trim().isEmpty() || passwordToBeSet.trim().isEmpty() || passwordToBeSet==null){
+        if(usernameToBeSet == null ||usernameToBeSet.trim().isEmpty() || passwordToBeSet.trim().isEmpty() || passwordToBeSet==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
         }
         String newToken = generateUniqueToken();
@@ -108,8 +103,6 @@ public class UserService {
     }
 
     // Helper needed for the login / registration to check if the assigned token is unique
-    /** PRODUCTION READY*/
-    /** SZYMON */
     public String generateUniqueToken(){
         String newToken = UUID.randomUUID().toString();
         User userByToken = userRepository.findByToken(newToken);
@@ -129,8 +122,8 @@ public class UserService {
     }
 
     public User login(User userInput){
-        String username=userInput.getUsername();
-        String password=userInput.getPassword();
+        String username = userInput.getUsername();
+        String password = userInput.getPassword();
         if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have to specify both the username and password.");
         }
@@ -146,7 +139,6 @@ public class UserService {
         userByUsername.setToken(newToken);
         userRepository.saveAndFlush(userByUsername);
         return userByUsername;
-
     }
 
     public void changeUserProfile(String token, String username, Date birthday, String password){
@@ -187,7 +179,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with the given token was not found.");
         }
         userByToken.setStatus(UserStatus.OFFLINE);
-        // TODO test logout with randomToken
         String randomToken = generateUniqueToken();
         userByToken.setToken(randomToken);
         userRepository.saveAndFlush(userByToken);
