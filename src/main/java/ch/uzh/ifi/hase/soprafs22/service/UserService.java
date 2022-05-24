@@ -198,25 +198,21 @@ public class UserService {
 
     @Scheduled(fixedDelay = 10000)
     public void ensureAvailability() {
-        long requestTimeout = 60000; // 60s
+        long logoutTimeout = 900000; // 15min
         long gameTimeout = 20000; // 20s
         for (User user : this.getUsers()) {
-            if (user.getStatus() != UserStatus.ONLINE) return;
+            if (user.getStatus() != UserStatus.ONLINE) continue;
             long diffLastSeen = new Date().getTime() - user.getLastSeen().getTime();
             long diffLastGameRequest = new Date().getTime() - user.getLastGameRequest().getTime();
             Player player = playerRepository.findByPlayerId(user.getUserId());
 
-            // User did not make any request in the given threshold
-            if (diffLastSeen >= requestTimeout) {
-                // if the user is currently in a game, kick him/her from that game
-                if (player != null)
-                    this.gameService.leaveGame(player.getCurrentGameId(), user.getToken());
-                this.logout(user.getToken());   // and then, log him/her out
-
-            } else if (player != null && diffLastGameRequest >= gameTimeout) {
-                // if the user is in a game, ensure he didn't just go to another page
+            // if the user is in a game and didn't make any game-related request for 20s -> kick
+            if (player != null && diffLastGameRequest >= gameTimeout)
                 this.gameService.leaveGame(player.getCurrentGameId(), user.getToken());
-            }
+
+            // If user did not make any request for the last 15min -> logout
+            if (diffLastSeen >= logoutTimeout)
+                this.logout(user.getToken());
         }
     }
 }
