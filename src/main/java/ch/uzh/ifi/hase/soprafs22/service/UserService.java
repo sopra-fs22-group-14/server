@@ -1,13 +1,18 @@
 package ch.uzh.ifi.hase.soprafs22.service;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,15 +30,21 @@ import java.util.UUID;
  */
 @Service
 @Transactional
+@Configuration
+@EnableScheduling
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final PlayerRepository playerRepository;
+    private final GameService gameService;
 
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService, PlayerRepository playerRepository) {
         this.userRepository = userRepository;
+        this.gameService = gameService;
+        this.playerRepository = playerRepository;
     }
 
     public void checkIfAuthorized(String token){
@@ -174,5 +185,34 @@ public class UserService {
         //return userByToken;
     }
 
+    public void updateLastSeen(String token) {
+        User user = userRepository.findByToken(token);
+        user.setLastSeen(new Date());
+    }
 
+    public void updateLastGameRequest(String token) {
+        User user = userRepository.findByToken(token);
+        user.setLastGameRequest(new Date());
+    }
+
+
+    @Scheduled(fixedDelay = 10000)
+    public void ensureAvailability() {
+        long logoutTimeout = 900000; // 15min
+        long gameTimeout = 20000; // 20s
+        for (User user : this.getUsers()) {
+            if (user.getStatus() != UserStatus.ONLINE) continue;
+            long diffLastSeen = new Date().getTime() - user.getLastSeen().getTime();
+            long diffLastGameRequest = new Date().getTime() - user.getLastGameRequest().getTime();
+            Player player = playerRepository.findByPlayerId(user.getUserId());
+
+            // if the user is in a game and didn't make any game-related request for 20s -> kick
+            if (player != null && diffLastGameRequest >= gameTimeout)
+                this.gameService.leaveGame(player.getCurrentGameId(), user.getToken());
+
+            // If user did not make any request for the last 15min -> logout
+            if (diffLastSeen >= logoutTimeout)
+                this.logout(user.getToken());
+        }
+    }
 }

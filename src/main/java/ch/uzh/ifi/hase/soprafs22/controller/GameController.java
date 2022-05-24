@@ -31,6 +31,7 @@ public class GameController {
 
         // GET TOKEN FROM HEADER CHECK IF AUTHORIZED etc..
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         List<Game> games = gameService.joinableGames();
         List<GameGetDTO> gameGetDTOs = new ArrayList<>();
 
@@ -67,6 +68,8 @@ public class GameController {
     @ResponseBody
     public GameGetDTO getGame(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
+        userService.updateLastGameRequest(token);
         Game requestedGame = gameService.getGame(gameId);
         User userByToken=userService.getUser(token);
         List<String> currentPlayerNames=requestedGame.getPlayerNames();
@@ -80,6 +83,7 @@ public class GameController {
     @ResponseBody
     public GameGetDTO createNewGame(@RequestHeader("Authorization") String token,@RequestBody GamePostDTO gamePostDTO){
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOToEntity(gamePostDTO);
         Game newGame = gameService.createNewGame(gameInput,token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(newGame);
@@ -90,7 +94,9 @@ public class GameController {
     @ResponseBody
     public void saveCombination(@RequestHeader("Authorization") String token,@RequestBody CombinationPostDTO combinationPostDTO){
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         userService.checkIfTokenMatchesUserId(token, combinationPostDTO.getPlayerId());
+        userService.updateLastGameRequest(token);
         gameService.saveBestCombination(combinationPostDTO.getBestCombination(), combinationPostDTO.getPlayerId());
     }
 
@@ -109,8 +115,9 @@ public class GameController {
     @PutMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO joinGame(@RequestHeader("Authorization") String token,@RequestBody GamePutDTO gamePutDTO){
+    public GameGetDTO joinGame(@RequestHeader("Authorization") String token,@RequestBody GamePutDTO gamePutDTO) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         Game joinedGame = gameService.joinGame(gamePutDTO.getGameId(),token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(joinedGame);
     }
@@ -122,6 +129,8 @@ public class GameController {
     public GameGetDTO updatePlayerCount(@RequestHeader("Authorization") String token,
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
+        userService.updateLastGameRequest(token);
         Game requestedGame = gameService.updatePlayerCount(gameId, token);
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(requestedGame);
     }
@@ -132,6 +141,8 @@ public class GameController {
     public GameSummaryGetDTO getGameSummaryAndWinner(@RequestHeader("Authorization") String token,
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
+        userService.updateLastGameRequest(token);
         Game requestedGame = gameService.getGameSummaryAndWinner(gameId);
         return DTOMapper.INSTANCE.convertEntityToGameSummaryGetDTO(requestedGame);
     }
@@ -142,6 +153,7 @@ public class GameController {
     public void leaveWaitingArea(@RequestHeader("Authorization") String token,
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
         gameService.leaveGame(gameId, token);
     }
 
@@ -150,8 +162,10 @@ public class GameController {
     @GetMapping("/player")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public PlayerGetDTO getPlayer(@RequestHeader("Authorization") String token){
+    public PlayerGetDTO getPlayer(@RequestHeader("Authorization") String token) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
+        userService.updateLastGameRequest(token);
         Player requestedPlayer=gameService.getPlayer(token);
         return DTOMapper.INSTANCE.convertEntityToPlayerGetDTO(requestedPlayer);
     }
@@ -161,8 +175,10 @@ public class GameController {
     @GetMapping("/{gameId}/gameround")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameRoundGetDTO getRound(@RequestHeader("Authorization") String token,@PathVariable long gameId){
+    public GameRoundGetDTO getRound(@RequestHeader("Authorization") String token,@PathVariable long gameId) {
         userService.checkIfAuthorized(token);
+        userService.updateLastSeen(token);
+        userService.updateLastGameRequest(token);
         GameRound requestedGameRound=gameService.getGameRound(gameId);
         Game gameById=gameService.getGame(gameId);
         if(!gameById.isCardCzarMode()){

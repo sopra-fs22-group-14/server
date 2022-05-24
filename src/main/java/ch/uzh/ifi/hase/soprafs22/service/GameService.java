@@ -76,7 +76,7 @@ public class GameService {
         if (gameRepository.findByGameName(gameInput.getGameName()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "GameName is already taken!");
         }
-        if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null){
+        if (playerRepository.findByPlayerId(userRepository.findByToken(token).getUserId())!=null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Player already joined another game.");
         }
         Game game = new Game();
@@ -97,11 +97,14 @@ public class GameService {
         game.setDeckID(d.getDeckId());
         game = gameRepository.saveAndFlush(game);
 
+        adminPlayer.setCurrentGameId(game.getGameId());   // from DIEGO
+        playerRepository.saveAndFlush(adminPlayer);   // from DIEGO
+
         return game;
     }
 
     private void addPlayerToGame(Player playerToAdd, Game game){
-        if (game.getNumOfPlayersJoined() < 4){
+        if (game.getNumOfPlayersJoined() < 4) {
             List<Long> players = game.getPlayerIds();
             players.add(playerToAdd.getPlayerId());
             game.setPlayerIds(players);
@@ -109,9 +112,7 @@ public class GameService {
             currentPlayerNames.add(playerToAdd.getPlayerName());
             game.setPlayerNames(currentPlayerNames);
             game.setNumOfPlayersJoined(game.getPlayerIds().size());
-        }
-
-        else{
+        } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already full! Join another game."); }
     }
 
@@ -121,6 +122,7 @@ public class GameService {
                 gameToLeave.getPlayerIds().remove(playerId);
                 List<String> currentPlayerNames=gameToLeave.getPlayerNames();
                 Player playerToDelete=playerRepository.findByPlayerId(playerId);
+                if (playerToDelete == null) return;
                 currentPlayerNames.remove(playerToDelete.getPlayerName());
                 gameToLeave.setPlayerNames(currentPlayerNames);
                 playerRepository.delete(playerToDelete);
@@ -132,14 +134,16 @@ public class GameService {
     }
 
     // function for joining a game
-    public Game joinGame(Long gameId, String token){
+    public synchronized Game joinGame(Long gameId, String token) {
         Game game = this.getGame(gameId);
         User userToJoin = userRepository.findByToken(token);
-        if (userToJoin.getStatus() == UserStatus.ONLINE){
+        if (userToJoin.getStatus() == UserStatus.ONLINE) {
             if (!game.getPlayerIds().contains(userToJoin.getUserId())) {
                 Player player = createPlayer(token);
                 addPlayerToGame(player, game);
                 gameRepository.saveAndFlush(game);
+                player.setCurrentGameId(game.getGameId());   // from DIEGO
+                playerRepository.saveAndFlush(player);   // from DIEGO
                 // if the lobby is full, start the game
                 if (game.getNumOfPlayersJoined() == 4) {
                     game.setActive(true);
@@ -151,7 +155,7 @@ public class GameService {
         } else { throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not logged in, cannot join a game!"); }
     }
 
-   private void startGame(Game game) {
+   private synchronized void startGame(Game game) {
        // get not played white cards
         List <Card> whiteCards=cardRepository.findByDeckIdAndIsWhiteAndIsPlayed(game.getDeckID(),true,false);
         int upperbound=whiteCards.size();
@@ -169,6 +173,7 @@ public class GameService {
            unique.add(number); // adding to the set
        }
        int card_Index=0;
+       List<Card> cardsToSave = new ArrayList<Card>();
        for(Long playerId: game.getPlayerIds()){
            Player currentPlayer=playerRepository.findByPlayerId(playerId);
            for(int i=0; i<10; i++){
@@ -177,13 +182,16 @@ public class GameService {
                playerCards.add(currentCard);
                currentPlayer.setCardsOnHands(playerCards);
                currentCard.setPlayed(true);
-               cardRepository.saveAndFlush(currentCard);
+               cardsToSave.add(currentCard);
+//               cardRepository.saveAndFlush(currentCard);
                card_Index++;
            }
            playerRepository.saveAndFlush(currentPlayer);
        }
+       cardRepository.saveAll(cardsToSave);
+       cardRepository.flush();
 
-        GameRound currentGameRound=gameRoundService.startNewRound(game);
+       GameRound currentGameRound=gameRoundService.startNewRound(game);
        return;
     }
 
@@ -199,9 +207,12 @@ public class GameService {
     }
 
     // method if a player decides to leave the game
-    public void leaveGame(Long gameId, String token) { //frontend knows the winner -->
+    public synchronized void leaveGame(Long gameId, String token) { //frontend knows the winner -->
         Game gameToLeave = this.getGame(gameId);
         User userToRemove = userRepository.findByToken(token);
+        Player playerToRemove = playerRepository.findByPlayerId(userToRemove.getUserId());   // from DIEGO
+        playerToRemove.setCurrentGameId(0L);   // from DIEGO
+        playerRepository.saveAndFlush(playerToRemove);   // from DIEGO
 
         // if the user is not in the game, don't do anything (no error required)
         if (!gameToLeave.getPlayerIds().contains(userToRemove.getUserId()))
@@ -212,17 +223,13 @@ public class GameService {
         removePlayerFromGame(gameToLeave, userToRemove);
         // if it is the last player, also delete the game/gameRounds/
         if (lastPlayer) {
-            //TODO delete cards/deck after game is finished
-            //TODO delete gameRound/game
-            //deleteGame(gameToLeave); //--> call this function and delete the below 2 lines
+            // DIEGO: security, if not all players properly left the game, delete them
+            for (Long id : gameToLeave.getPlayerIds()) {
+                playerRepository.deleteById(id);
+                playerRepository.flush();
+            }
             gameRepository.delete(gameToLeave);
             gameRepository.flush();
-//            Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
-//            List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
-//            cardRepository.deleteAll(cardsToBeDeleted);
-//            cardRepository.flush();
-//            deckRepository.delete(deckToBeDeleted);
-//            deckRepository.flush();
         }
     }
 
