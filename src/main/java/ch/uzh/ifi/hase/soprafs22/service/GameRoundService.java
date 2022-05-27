@@ -242,7 +242,7 @@ public class GameRoundService {
             }
         }
     }
-    private void transferPoints(Game game){
+    private synchronized void transferPoints(Game game) {
         List<Long>currentPlayerIds=game.getPlayerIds();
         int maxRoundWin=0;
         for(Long currentPlayerId: currentPlayerIds){
