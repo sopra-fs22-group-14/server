@@ -135,7 +135,7 @@ public class GameService {
     }
 
     // function for joining a game
-    public Game joinGame(Long gameId, String token) {
+    public synchronized Game joinGame(Long gameId, String token) {
         Game game = this.getGame(gameId);
         User userToJoin = userRepository.findByToken(token);
         if (userToJoin.getStatus() == UserStatus.ONLINE) {
