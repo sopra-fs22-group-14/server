@@ -41,26 +41,6 @@ public class GameController {
         // return DTOs
         return gameGetDTOs;
 
-        /*
-        Game gameA = new Game();
-        gameA.setGameId(1L);
-        gameA.setGameName("game1");
-        gameA.setGameEdition("normal");
-        gameA.setCardCzarMode(false);
-        gameA.setNumOfPlayersJoined((int)((Math.random() * (4 - 1)) + 1));
-
-        Game gameB = new Game();
-        gameB.setGameId(2L);
-        gameB.setGameName("game2");
-        gameB.setGameEdition("weird");
-        gameB.setCardCzarMode(true);
-        gameB.setNumOfPlayersJoined((int)((Math.random() * (4 - 1)) + 1));
-
-        List<GameGetDTO> gameGetDTOs = new ArrayList<>();
-        // convert each user to the API representation
-        gameGetDTOs.add(DTOMapper.INSTANCE.convertEntityToGameGetDTO(gameA));
-        gameGetDTOs.add(DTOMapper.INSTANCE.convertEntityToGameGetDTO(gameB));
-        */
     }
 
     @GetMapping("/games/{gameId}")
@@ -68,8 +48,6 @@ public class GameController {
     @ResponseBody
     public GameGetDTO getGame(@RequestHeader("Authorization") String token, @PathVariable long gameId) {
         userService.checkIfAuthorized(token);
-        userService.updateLastSeen(token);
-        userService.updateLastGameRequest(token);
         Game requestedGame = gameService.getGame(gameId);
         User userByToken=userService.getUser(token);
         List<String> currentPlayerNames=requestedGame.getPlayerNames();
@@ -101,17 +79,6 @@ public class GameController {
     }
 
 
-
-//    // GAME DELETION
-//    @DeleteMapping("/games/{gameId}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void deleteGame(@RequestHeader("Authorization") String token, @PathVariable Long gameId){
-//        // checking if the user is authorized
-//        userService.checkIfAuthorized(token);
-//        gameService.deleteGameInWaitingArea(gameId, token); // game is deleted
-//    }
-
-
     @PutMapping("/games")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -141,8 +108,6 @@ public class GameController {
     public GameSummaryGetDTO getGameSummaryAndWinner(@RequestHeader("Authorization") String token,
                                         @PathVariable Long gameId) {
         userService.checkIfAuthorized(token);
-        userService.updateLastSeen(token);
-        userService.updateLastGameRequest(token);
         Game requestedGame = gameService.getGameSummaryAndWinner(gameId);
         return DTOMapper.INSTANCE.convertEntityToGameSummaryGetDTO(requestedGame);
     }

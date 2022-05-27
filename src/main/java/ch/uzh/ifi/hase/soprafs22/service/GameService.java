@@ -234,30 +234,6 @@ public class GameService {
         }
     }
 
-    //deletes the Cards, Deck, GameRounds, Game
-    public void deleteGame(Game gameToLeave){
-        //TODO delete cards/deck after game is finished
-        //TODO delete gameRound/game
-
-        List<Long> gameRoundIds = gameToLeave.getRoundIds();
-        for(Long gameRoundId: gameRoundIds){
-            GameRound gameRoundToDelete = gameRoundRepository.findByRoundId(gameRoundId);
-            gameRoundRepository.delete(gameRoundToDelete);
-        }
-        gameRoundRepository.flush();
-        Deck deckToBeDeleted = deckRepository.findByDeckId(gameToLeave.getDeckID());
-        List<Card> cardsToBeDeleted = cardRepository.findByDeckId(gameToLeave.getDeckID());
-        //for (Card cardToBeDeleted : cardsToBeDeleted){
-        //Card deleteCard = cardRepository.findByCardId(cardToBeDeleted.getCardId());
-        //cardRepository.delete(deleteCard);
-        //}
-        cardRepository.deleteAll(cardsToBeDeleted);
-        cardRepository.flush();
-        deckRepository.delete(deckToBeDeleted);
-        deckRepository.flush();
-        gameRepository.delete(gameToLeave);
-        gameRepository.flush();
-    }
 
     private Player createPlayer(String token){
         User user = userRepository.findByToken(token);

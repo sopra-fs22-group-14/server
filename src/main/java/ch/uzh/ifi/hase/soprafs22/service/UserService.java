@@ -3,8 +3,10 @@ package ch.uzh.ifi.hase.soprafs22.service;
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.Player;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.entity.UserTimestamp;
 import ch.uzh.ifi.hase.soprafs22.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs22.repository.UserTimestampRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +40,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PlayerRepository playerRepository;
+    private final UserTimestampRepository userTimestampRepository;
     private final GameService gameService;
 
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService, PlayerRepository playerRepository) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository, GameService gameService, PlayerRepository playerRepository, UserTimestampRepository timestampRepository) {
         this.userRepository = userRepository;
         this.gameService = gameService;
         this.playerRepository = playerRepository;
+        this.userTimestampRepository = timestampRepository;
     }
 
     public void checkIfAuthorized(String token){
@@ -97,6 +101,11 @@ public class UserService {
         // flush() is called
         newUser = userRepository.save(newUser); //saving in memory
         userRepository.flush(); //persist in Db
+
+        UserTimestamp newUserTimestamp = new UserTimestamp();
+        newUserTimestamp.setUserId(newUser.getUserId());
+        userTimestampRepository.save(newUserTimestamp);
+        userTimestampRepository.flush();
 
         log.debug("Created Information for User: {}", newUser);
         return newUser;
@@ -187,12 +196,16 @@ public class UserService {
 
     public void updateLastSeen(String token) {
         User user = userRepository.findByToken(token);
-        user.setLastSeen(new Date());
+        UserTimestamp userTimestamp = userTimestampRepository.findByUserId(user.getUserId());
+        userTimestamp.setLastSeen(new Date());
+        userTimestampRepository.saveAndFlush(userTimestamp);
     }
 
     public void updateLastGameRequest(String token) {
         User user = userRepository.findByToken(token);
-        user.setLastGameRequest(new Date());
+        UserTimestamp userTimestamp = userTimestampRepository.findByUserId(user.getUserId());
+        userTimestamp.setLastGameRequest(new Date());
+        userTimestampRepository.saveAndFlush(userTimestamp);
     }
 
 
@@ -202,8 +215,9 @@ public class UserService {
         long gameTimeout = 20000; // 20s
         for (User user : this.getUsers()) {
             if (user.getStatus() != UserStatus.ONLINE) continue;
-            long diffLastSeen = new Date().getTime() - user.getLastSeen().getTime();
-            long diffLastGameRequest = new Date().getTime() - user.getLastGameRequest().getTime();
+            UserTimestamp userTimestamp = userTimestampRepository.findByUserId(user.getUserId());
+            long diffLastSeen = new Date().getTime() - userTimestamp.getLastSeen().getTime();
+            long diffLastGameRequest = new Date().getTime() - userTimestamp.getLastGameRequest().getTime();
             Player player = playerRepository.findByPlayerId(user.getUserId());
 
             // if the user is in a game and didn't make any game-related request for 20s -> kick
