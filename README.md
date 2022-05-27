@@ -1,49 +1,41 @@
-# SoPra RESTful Service Template FS22
+<h1 align="center">
+  <br>
+  <a href="https://github.com/sopra-fs22-group-14"><img src="src/CAH_Logo.png" alt="Cards Against Humanity" width="300"></a>
+  <br>
+  Cards Against Humanity - Server
+  <br>
+</h1>
 
-## Getting started with Spring Boot
+<p align="center">
+   <a href="https://github.com/sopra-fs22-group-14/server/actions">
+     <img src="https://github.com/sopra-fs22-group-14/server/workflows/Deploy%20Project/badge.svg" alt="Deployment Status">
+   </a>
+   <a href="https://sonarcloud.io/project/overview?id=sopra-fs22-group-14_server">
+      <img src="https://sonarcloud.io/api/project_badges/measure?project=sopra-fs22-group-14_server&metric=alert_status" alt="Quality Gate Status">
+  </a>
+</p>
 
--   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
--   Guides: http://spring.io/guides
-    -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
-    -   Building REST services with Spring: http://spring.io/guides/tutorials/bookmarks/
+## Introduction
 
-## Setup this Template with your IDE of choice
+Cards Against Humanity is a fill-in-the-blank party game that turns your awkward personality and lackluster social skills into hours of fun! It is a game usually played in person, but we wanted to make this fun available to anyone, anywhere and at anytime - even if you cannot be physically together!
 
-Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/), [IntelliJ](https://www.jetbrains.com/idea/download/)), [Visual Studio Code](https://code.visualstudio.com/) and make sure Java 15 is installed on your system (for Windows-users, please make sure your JAVA_HOME environment variable is set to the correct version of Java).
+This repository is the back-end bit of our application!
 
-1. File -> Open... -> SoPra Server Template
-2. Accept to import the project as a `gradle project`
+## Technologies
 
-To build right click the `build.gradle` file and choose `Run Build`
+The back-end is written in Java using Spring-Boot as a framework.
 
-## Database setup to see our schema/persistent data
+To communicate with the client, REST is used. To ensure that all clients have the relevant information at hand, we make use of polling and therefore the front-end hits different enpoints in defined time intervals.
 
-Since we use a persistent non-volatile database from Postgres and run the DB-instance on AWS, there are some further steps necessary to see the persistent data:
-The following link will guide you through the necessary steps:
+Since we have a user system containing records of previous games, we use PostgreSQL as a persistent database to store the data.
 
-https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html
+## High-Level Components
 
-Sidenote: To gain access when developing, the environment variables with the corresponding credentials must have been set locally
+TODO
 
+## Launch & Development
 
-### VS Code
-The following extensions will help you to run it more easily:
--   `pivotal.vscode-spring-boot`
--   `vscjava.vscode-spring-initializr`
--   `vscjava.vscode-spring-boot-dashboard`
--   `vscjava.vscode-java-pack`
--   `richardwillis.vscode-gradle`
-
-**Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `soprafs22` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
-
-## Building with Gradle
-
-You can use the local Gradle Wrapper to build the application.
--   macOS: `./gradlew`
--   Linux: `./gradlew`
--   Windows: `./gradlew.bat`
-
-More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) and [Gradle](https://gradle.org/docs/).
+Download your IDE of choice: (e.g., [Eclipse](http://www.eclipse.org/downloads/), [IntelliJ](https://www.jetbrains.com/idea/download/) or [Visual Studio Code](https://code.visualstudio.com/)) and make sure Java 15 is installed on your system (for Windows-users, please make sure your JAVA_HOME environment variable is set to the correct version of Java).
 
 ### Build
 
@@ -80,27 +72,42 @@ If you want to avoid running all tests with every change, use the following comm
 
 `./gradlew build --continuous -xtest`
 
-## API Endpoint Testing
+### Database setup to see our schema/persistent data
 
-### Postman
+Since we use a persistent non-volatile database from Postgres and run the DB-instance on AWS, there are some further steps necessary to see the persistent data:
+The following [article](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html) will guide you through the necessary steps.
 
--   We highly recommend to use [Postman](https://www.getpostman.com) in order to test your API Endpoints.
+Sidenote: To gain access when developing, the environment variables with the corresponding credentials must have been set locally
 
-## Debugging
+### Useful links to ge started with Spring Boot
 
-If something is not working and/or you don't know what is going on. We highly recommend that you use a debugger and step
-through the process step-by-step.
+-   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
+-   Guides: http://spring.io/guides
+    -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
+    -   Building REST services with Spring: http://spring.io/guides/tutorials/bookmarks/
 
-To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you start with `./gradlew bootRun` command),
-do the following:
+## Illustrations
 
-1. Open Tab: **Run**/Edit Configurations
-2. Add a new Remote Configuration and name it properly
-3. Start the Server in Debug mode: `./gradlew bootRun --debug-jvm`
-4. Press `Shift + F9` or the use **Run**/Debug"Name of your task"
-5. Set breakpoints in the application where you need it
-6. Step through the process one step at a time
+TODO add pictures with description
 
-## Testing
+## Roadmap
 
-Have a look here: https://www.baeldung.com/spring-boot-testing
+The following things could be implemented in the future:
+
+   1. New endpoint for the round ending in the Community Mode, so that the played cards and the times chosen can be associated to the users
+   2. Include a chat feature to enable communication during the game
+   3. Develop a mobile version of the game, so that it can be played on mobile devices too
+
+## Authors and Acknowledgements
+
+<h3>Members of Group 14 (SoPra 2022):</h3>
+
+[Diego Bugmann](https://github.com/diegobugmann), [Szymon Kaczmarski](https://github.com/Szymskiii), [Alexander Lerch](https://github.com/lerchal1) and [Ege Onur Güleç](https://github.com/ogegulec16)
+
+<h3>Acknowledgements</h3>
+
+We would like to thank our tutor [Kyrill Hux](https://github.com/realChesta), who was always able to support us when we had any concerns. His support resulted in an application that is more user-friendy and also more secure :)
+
+## License
+
+[Apache License 2.0](LICENSE)
