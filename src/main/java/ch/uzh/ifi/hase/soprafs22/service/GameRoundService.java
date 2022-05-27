@@ -147,7 +147,7 @@ public class GameRoundService {
 
     }
 
-    public synchronized void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
+    public void pickWinner(Long gameId,Long gameRoundId,String token,Long cardId){
         Game requestedGame=gameRepository.findByGameId(gameId);
         if (requestedGame.isCardCzarMode()) {
             String roundWinner = chooseRoundWinner(gameRoundId, token, cardId);
@@ -242,7 +242,7 @@ public class GameRoundService {
             }
         }
     }
-    private synchronized void transferPoints(Game game) {
+    private void transferPoints(Game game) {
         List<Long>currentPlayerIds=game.getPlayerIds();
         int maxRoundWin=0;
         for(Long currentPlayerId: currentPlayerIds){

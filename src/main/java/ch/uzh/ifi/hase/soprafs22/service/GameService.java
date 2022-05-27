@@ -84,7 +84,8 @@ public class GameService {
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
-        game.setNumOfRounds(gameInput.getNumOfRounds());
+//        game.setNumOfRounds(gameInput.getNumOfRounds());
+        game.setNumOfRounds(4);
         //TODO set RoundValues back to User input
         //game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
@@ -134,7 +135,7 @@ public class GameService {
     }
 
     // function for joining a game
-    public synchronized Game joinGame(Long gameId, String token) {
+    public Game joinGame(Long gameId, String token) {
         Game game = this.getGame(gameId);
         User userToJoin = userRepository.findByToken(token);
         if (userToJoin.getStatus() == UserStatus.ONLINE) {
