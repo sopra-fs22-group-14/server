@@ -83,24 +83,35 @@ public class UserServiceTest {
   public void login_success(){
       testUser.setToken("testToken");
       User testInput=new User();
+      UserStatus initialStatus = testInput.getStatus();
       testInput.setUsername("testUsername");
       testInput.setPassword("testPassword");
       Mockito.when(userRepository.findByUsername("testUsername")).thenReturn(testUser);
-      Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
-      userService.login(testInput);
 
+      User loggedInUser = userService.login(testInput);
+
+      assertEquals(initialStatus, null);
+      assertEquals(loggedInUser.getStatus(), UserStatus.ONLINE);
   }
   @Test
   public void changeUserProfile_success(){
       Date testBirthday=new Date();
+      String initialUsername = testUser.getUsername();
+      Date initialBirthday = testUser.getBirthday();
       Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
-      userService.changeUserProfile("testToken","testUsername",testBirthday,"testPassword");
+      userService.changeUserProfile("testToken","newTestUsername",testBirthday,"testPassword");
+
+      assertNotEquals(initialBirthday, testUser.getBirthday());
+      assertNotEquals(initialUsername, testUser.getUsername());
+      assertEquals(testUser.getUsername(), "newTestUsername");
+      assertEquals(testUser.getBirthday(), testBirthday);
   }
   @Test
   public void logout_success(){
       testUser.setStatus(UserStatus.ONLINE);
       Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
       userService.logout("testToken");
+      assertEquals(testUser.getStatus(), UserStatus.OFFLINE);
   }
   @Test
   public void getUser_success(){
@@ -111,24 +122,26 @@ public class UserServiceTest {
   @Test
   public void getUserRecords_success(){
       Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
-      User foundUser=userService.getUserRecords(testUser.getUserId());
-      assertEquals(foundUser.getUserId(),testUser.getUserId());
+      assertDoesNotThrow(() -> userService.getUserRecords(testUser.getUserId()));
   }
   @Test
   public void changeUserPassword_success(){
+      String initialPassword = testUser.getPassword();
       Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
       User foundUser=userService.changeUserPassword("testToken","testPassword","testNewPassword");
-      assertEquals(foundUser.getUserId(),testUser.getUserId());
+
+      assertEquals(foundUser.getPassword(), "testNewPassword");
+      assertNotEquals(foundUser.getPassword(), initialPassword);
   }
   @Test
   public void checkIfAuthorized_success(){
       Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
-      userService.checkIfAuthorized("testToken");
+      assertDoesNotThrow(() -> userService.checkIfAuthorized("testToken"));
   }
   @Test
   public void checkIfTokenMatchesUserId_success(){
       Mockito.when(userRepository.findByUserId(testUser.getUserId())).thenReturn(testUser);
-      userService.checkIfTokenMatchesUserId("testToken",testUser.getUserId());
+      assertDoesNotThrow(() -> userService.checkIfTokenMatchesUserId("testToken",testUser.getUserId()));
   }
 
   @Test
@@ -142,6 +155,41 @@ public class UserServiceTest {
     // then -> attempt to create second user with same user -> check that an error
     // is thrown
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+  }
+
+  @Test
+  public void test_updateLastSeen() {
+
+    User testUser = new User();
+    String testToken = "123abc";
+    UserTimestamp testUserTimeStamp = new UserTimestamp();
+
+    Date currentLastSeen = testUserTimeStamp.getLastSeen();
+
+    Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
+    Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
+
+    userService.updateLastSeen(testToken);
+    assertNotEquals(testUserTimeStamp.getLastSeen(), currentLastSeen);
+
+  }
+
+  @Test
+  public void test_updateLastGameRequest() {
+
+    User testUser = new User();
+    String testToken = "123abc";
+    UserTimestamp testUserTimeStamp = new UserTimestamp();
+
+    Date currentLastGameRequest = testUserTimeStamp.getLastSeen();
+
+    Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
+    Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
+
+    userService.updateLastGameRequest(testToken);
+    // check whether the timestamp was successfully updated
+    assertNotEquals(testUserTimeStamp.getLastGameRequest(), currentLastGameRequest);
+
   }
 
 //    @Test
