@@ -89,10 +89,6 @@ Sidenote: To gain access when developing, the environment variables with the cor
     -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
     -   Building REST services with Spring: http://spring.io/guides/tutorials/bookmarks/
 
-## Illustrations
-
-TODO add pictures with description
-
 ## Roadmap
 
 The following things could be implemented in the future:
