@@ -128,6 +128,7 @@ public class GameService {
                 playerRepository.delete(playerToDelete);
                 playerRepository.flush();
                 gameToLeave.decreasePlayers();
+                gameRepository.saveAndFlush(gameToLeave);
                 return;
             }
         }
