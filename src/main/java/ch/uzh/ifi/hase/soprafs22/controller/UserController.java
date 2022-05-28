@@ -108,7 +108,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void logout(@RequestHeader("Authorization") String token) {
-        // TODO set new Token when logging out
         //System.out.println("TOKEN: "+token);
         userService.checkIfAuthorized(token);
         userService.updateLastSeen(token);
