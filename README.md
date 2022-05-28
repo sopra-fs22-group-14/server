@@ -13,6 +13,9 @@
    <a href="https://sonarcloud.io/project/overview?id=sopra-fs22-group-14_server">
       <img src="https://sonarcloud.io/api/project_badges/measure?project=sopra-fs22-group-14_server&metric=alert_status" alt="Quality Gate Status">
   </a>
+  <a>
+      <img src="https://sonarcloud.io/api/project_badges/measure?project=sopra-fs22-group-14_server&metric=coverage" alt="Test Coverage">
+  </a>
 </p>
 
 ## Introduction
