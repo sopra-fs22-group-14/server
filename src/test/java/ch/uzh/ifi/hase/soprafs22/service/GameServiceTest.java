@@ -171,9 +171,8 @@ public class GameServiceTest {
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser2);
         //Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer);
         //Mockito.when(playerRepository.save(Mockito.any())).thenReturn(testPlayer2);
-
-
     }
+
     @Test
     public void createGame_validInputs_success(){
         Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
@@ -191,23 +190,30 @@ public class GameServiceTest {
         assertEquals(testGame.getCurrentGameRoundIndex(),createdGame.getCurrentGameRoundIndex());
         assertEquals(testGame.getNumOfRounds(),createdGame.getNumOfRounds());
         assertEquals(testGame.getGameName(),createdGame.getGameName());
-
     }
+
     @Test
     public void createGame_duplicateInputs_throwException(){
         String exceptionMessage = "GameName is already taken!";
         Mockito.when(gameRepository.findByGameName(testGame.getGameName())).thenReturn(testGame);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.createNewGame(testGame,"testToken"));
         assertEquals(exceptionMessage,exception.getReason());
-
     }
+
     @Test
-    public void joinGame_validInputs_success(){
+    public void joinGame_validInputs_success() {
+        // game was created -> 1 player was joined
+        assertEquals(1, testGame.getNumOfPlayersJoined());
+
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(userRepository.findByToken(testUser2.getToken())).thenReturn(testUser2);
         Mockito.when(playerRepository.saveAndFlush(Mockito.any())).thenReturn(testPlayer2);
         Game joinedGame=gameService.joinGame(testGame.getGameId(),"testToken2");
+
+        // someone else joined
+        assertEquals(2, joinedGame.getNumOfPlayersJoined());
     }
+
     @Test
     public void joinGame_notLoggedIn_throwsException(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -216,6 +222,7 @@ public class GameServiceTest {
         String exceptionMessage = "User is not logged in, cannot join a game!";
         assertEquals(exceptionMessage,exception.getReason());
     }
+
     @Test
     public void joinGame_playerAlreadyJoined_throwsException(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -223,7 +230,6 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.joinGame(testGame.getGameId(),"testToken"));
         String exceptionMessage = "The user is already in the game!";
         assertEquals(exceptionMessage,exception.getReason());
-
     }
 
     @Test
@@ -239,8 +245,8 @@ public class GameServiceTest {
         assertEquals(foundGame.getCurrentGameRoundIndex(),testGame.getCurrentGameRoundIndex());
         assertEquals(foundGame.getNumOfRounds(),testGame.getNumOfRounds());
         assertEquals(foundGame.getGameName(),testGame.getGameName());
-
     }
+
     @Test
     public void getGame_notFound_throwsException(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(null);
@@ -248,14 +254,19 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.getGame(testGame.getGameId()));
         String exceptionMessage = "Game with given Id doesn't exist!";
         assertEquals(exceptionMessage,exception.getReason());
-
     }
+
     @Test
     public void updatePlayerCount_validInput_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
-        Game updatedGame=gameService.updatePlayerCount(testGame.getGameId(),"testToken");
+        Game updatedGame = gameService.updatePlayerCount(testGame.getGameId(),"testToken");
+
+        // no one else joined -> number of players = 1
+        assertEquals(updatedGame.getNumOfPlayersJoined(), testGame.getNumOfPlayersJoined());
+        assertEquals(1, updatedGame.getNumOfPlayersJoined());
     }
+
     @Test
     public void updatePlayerCount_notJoined_throwsException(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -263,8 +274,8 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.updatePlayerCount(testGame.getGameId(),"testToken2"));
         String exceptionMessage = "User is not in this game, join first!";
         assertEquals(exceptionMessage,exception.getReason());
-
     }
+
     @Test
     public void getPlayer_success(){
         Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
@@ -274,9 +285,7 @@ public class GameServiceTest {
         assertEquals(foundPlayer.getPlayerName(),testPlayer.getPlayerName());
         assertEquals(foundPlayer.getRoundsWon(),testPlayer.getRoundsWon());
         assertEquals(foundPlayer.getCardsOnHands(),testPlayer.getCardsOnHands());
-
     }
-
 
     @Test
     public void joinGame_withStartGame_success(){
@@ -313,6 +322,8 @@ public class GameServiceTest {
         Mockito.when(gameRoundService.startNewRound(testGame)).thenReturn(testRound);
         Game joinedGame=gameService.joinGame(testGame.getGameId(),"testToken2");
 
+        assertEquals(4, joinedGame.getNumOfPlayersJoined());
+        assertTrue(joinedGame.isActive());
     }
     @Test
     public void getCard_success(){
@@ -320,6 +331,7 @@ public class GameServiceTest {
         Card foundCard=gameService.getCard(testCard.getCardId());
         assertEquals(foundCard.getCardId(),testCard.getCardId());
     }
+
     @Test
     public void get_Card_notExists_throwsException(){
         Mockito.when(cardRepository.findByCardId(testCard.getCardId())).thenReturn(null);
@@ -327,6 +339,7 @@ public class GameServiceTest {
         String exceptionMessage = "card with the id token was not found.";
         assertEquals(exceptionMessage,exception.getReason());
     }
+
     @Test
     public void isInGame_notInGame_throwsException(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
@@ -335,20 +348,20 @@ public class GameServiceTest {
         String exceptionMessage = "player is not in this game!";
         assertEquals(exceptionMessage,exception.getReason());
     }
+
     @Test
     public void isInGame_playerInGame_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(userRepository.findByToken(testUser.getToken())).thenReturn(testUser);
-        gameService.isInGame("testToken",testGame.getGameId());
-
+        assertDoesNotThrow(() -> gameService.isInGame("testToken",testGame.getGameId()));
     }
+
     @Test
     public void getGameSummaryAndWinner_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(playerRepository.findByPlayerId(1L)).thenReturn(testPlayer);
         Game foundGame=gameService.getGameSummaryAndWinner(testGame.getGameId());
         assertEquals(foundGame.getGameId(),testGame.getGameId());
-
     }
 
     @Test
@@ -358,20 +371,29 @@ public class GameServiceTest {
         GameRound foundGameRound=gameService.getGameRound(testGame.getGameId());
         assertEquals(foundGameRound.getRoundId(),testRound.getRoundId());
     }
+
     @Test
-    public void leavaGame_success(){
+    public void leaveGame_success(){
         Mockito.when(gameRepository.findByGameId(testGame.getGameId())).thenReturn(testGame);
         Mockito.when(userRepository.findByToken("testToken")).thenReturn(testUser);
         Mockito.when(playerRepository.findByPlayerId(testUser.getUserId())).thenReturn(testPlayer);
         gameService.leaveGame(testGame.getGameId(),"testToken");
+
+        // no player left in that game:
+        assertEquals(0, testGame.getNumOfPlayersJoined());
     }
+
     @Test
     public void joinableGames_success(){
         List<Game> testJoinableGames=new ArrayList<>();
         testJoinableGames.add(testGame);
         Mockito.when(gameRepository.findAll()).thenReturn(testJoinableGames);
-        List<Game> foundGames=gameService.joinableGames();
+        List<Game> foundGames = gameService.joinableGames();
+
+        assertEquals(foundGames, testJoinableGames);
+        assertEquals(1, foundGames.size());
     }
+
     @Test
     public void saveBestCombination_success(){
         List<String> testCombinations=new ArrayList<>();
@@ -380,7 +402,9 @@ public class GameServiceTest {
         Mockito.when(playerRepository.findByPlayerId(testPlayer.getPlayerId())).thenReturn(testPlayer);
         Mockito.when(userRepository.findByUserId(testPlayer.getPlayerId())).thenReturn(testUser);
         gameService.saveBestCombination("testCombination",testPlayer.getPlayerId());
+
     }
+
     @Test
     public void saveBestCombination_throwsException(){
         List<String> testCombinations=new ArrayList<>();
@@ -391,8 +415,6 @@ public class GameServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> gameService.saveBestCombination("testCombination",testPlayer.getPlayerId()));
         String exceptionMessage = "Your chosen combination was not found in the List of combination";
         assertEquals(exceptionMessage,exception.getReason());
-
     }
-
 
 }
