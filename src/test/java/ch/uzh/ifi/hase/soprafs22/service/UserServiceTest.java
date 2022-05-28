@@ -2,7 +2,9 @@ package ch.uzh.ifi.hase.soprafs22.service;
 
 import ch.uzh.ifi.hase.soprafs22.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs22.entity.User;
+import ch.uzh.ifi.hase.soprafs22.entity.UserTimestamp;
 import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs22.repository.UserTimestampRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,11 +21,14 @@ public class UserServiceTest {
 
   @Mock
   private UserRepository userRepository;
+  @Mock
+  private UserTimestampRepository userTimestampRepository;
 
   @InjectMocks
   private UserService userService;
 
   private User testUser;
+  private UserTimestamp testUserTimestamp;
 
   @BeforeEach
   public void setup() {
@@ -36,10 +41,12 @@ public class UserServiceTest {
     testUser.setPassword("testPassword");
     testUser.setToken("testToken");
 
+    testUserTimestamp = new UserTimestamp();
 
     // when -> any object is being save in the userRepository -> return the dummy
     // testUser
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
+    Mockito.when(userTimestampRepository.save(Mockito.any())).thenReturn(testUserTimestamp);
   }
 
   @Test
@@ -47,6 +54,7 @@ public class UserServiceTest {
     // when -> any object is being save in the userRepository -> return the dummy
     // testUser
     User createdUser = userService.createUser(testUser);
+
 
     // then
     Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
