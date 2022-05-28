@@ -84,8 +84,7 @@ public class GameService {
         game.setCardCzarMode(gameInput.isCardCzarMode());
         game.setNumOfPlayersJoined(1);
         game.setCurrentGameRoundIndex(0);
-//        game.setNumOfRounds(gameInput.getNumOfRounds());
-        game.setNumOfRounds(4);
+        game.setNumOfRounds(gameInput.getNumOfRounds());
         //TODO set RoundValues back to User input
         //game.setNumOfRounds(4);
         game.setGameEdition(gameInput.getGameEdition());
@@ -297,8 +296,7 @@ public class GameService {
                 c.setPlayed(false);
                 c.setCanBeChoosen(true);
                 cards.add(c);
-                //cardRepository.save(c);
-                blackCards.add(line); //test printing out all the Cards on Console
+                blackCards.add(line);
             }
         }
         catch (IOException e) {
@@ -315,31 +313,22 @@ public class GameService {
                 c.setCanBeChoosen(true);
                 cards.add(c);
                 //cardRepository.save(c);
-                whiteCards.add(line);//test printing out all the Cards on Console
+                whiteCards.add(line);
             }
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //test printing out all the Cards on Console
         cards=cardRepository.saveAll(cards);
         cardRepository.flush();
-        //d.setCards(cards);
         d=deckRepository.save(d);
-        //List<Card> test = d.getCards();
         for(Card card: cards ){
-            //System.out.println(card.getCardText());
             card.setDeckId(d.getDeckId());
-            //cardRepository.save(card);
         }
         cardRepository.saveAll(cards);
         cardRepository.flush();
         deckRepository.flush();
-        //System.out.println("EntityDeck"); //test printing out all the Cards on Console
-        //System.out.println(d.getCards()); //test printing out all the Cards on Console
-        //System.out.println("Cards:"); //test printing out all the Cards on Console
-        //System.out.println(whiteCards); //test printing out all the Cards on Console
-        //System.out.println(blackCards); //test printing out all the Cards on Console
+
         return d;
     }
 
