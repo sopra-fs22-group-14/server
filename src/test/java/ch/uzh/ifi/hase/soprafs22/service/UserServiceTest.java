@@ -170,7 +170,7 @@ public class UserServiceTest {
     Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
 
     userService.updateLastSeen(testToken);
-    assertNotEquals(testUserTimeStamp.getLastSeen(), currentLastSeen);
+    assertNotEquals(testUserTimeStamp.getLastSeen().getTime(), currentLastSeen.getTime());
 
   }
 
@@ -181,37 +181,15 @@ public class UserServiceTest {
     String testToken = "123abc";
     UserTimestamp testUserTimeStamp = new UserTimestamp();
 
-    Date currentLastGameRequest = testUserTimeStamp.getLastSeen();
+    Date currentLastGameRequest = testUserTimeStamp.getLastGameRequest();
 
     Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
     Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
 
     userService.updateLastGameRequest(testToken);
     // check whether the timestamp was successfully updated
-    assertNotEquals(testUserTimeStamp.getLastGameRequest(), currentLastGameRequest);
+    assertNotEquals(testUserTimeStamp.getLastGameRequest().getTime(), currentLastGameRequest.getTime());
 
   }
-
-//    @Test
-//    public void checkifAuthorized_success() {
-//        // when -> any object is being save in the userRepository -> return the dummy
-//        // testUser
-//        Mockito.when(userRepository.findByUserId(1L)).thenReturn(testUser);
-//        userService.checkIfAuthorized(testUser.getToken());
-//    }
-
-
-//    @Test
-//    public void checkIfAuthorized_fail_throwException() {
-//        // given -> a first user has already been created
-//        userService.checkIfAuthorized("abcd");
-//
-//        // when -> setup additional mocks for UserRepository
-//        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
-//
-//        // then -> attempt to create second user with same user -> check that an error
-//        // is thrown
-//        assertThrows(ResponseStatusException.class, () -> userService.checkIfAuthorized(testUser.getToken()));
-//    }
 
 }
