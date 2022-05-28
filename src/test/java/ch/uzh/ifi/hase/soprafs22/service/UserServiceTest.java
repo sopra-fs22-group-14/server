@@ -165,6 +165,7 @@ public class UserServiceTest {
     UserTimestamp testUserTimeStamp = new UserTimestamp();
 
     Date currentLastSeen = testUserTimeStamp.getLastSeen();
+    currentLastSeen.setTime(currentLastSeen.getTime()-1000);   // request was 1sec ago
 
     Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
     Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
@@ -182,6 +183,7 @@ public class UserServiceTest {
     UserTimestamp testUserTimeStamp = new UserTimestamp();
 
     Date currentLastGameRequest = testUserTimeStamp.getLastGameRequest();
+    currentLastGameRequest.setTime(currentLastGameRequest.getTime()-1000);   // request was 1sec ago
 
     Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
     Mockito.when(userTimestampRepository.findByUserId(Mockito.any())).thenReturn(testUserTimeStamp);
