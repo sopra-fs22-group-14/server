@@ -34,7 +34,13 @@ Since we have a user system containing records of previous games, we use Postgre
 
 ## High-Level Components
 
-TODO
+The [User](src/main/java/ch/uzh/ifi/hase/soprafs22/entity/User.java) entity is the representation for every user which has fields like username, password, total games and rounds won and even favourite combinations from previous games. Every user can create or join a game, which results in a [Player](src/main/java/ch/uzh/ifi/hase/soprafs22/entity/Player.java) being created. A player holds additional information such as cards on hand, their role (Card Czar or not) and the amount of rounds won for that specific Game.
+
+The [Game](src/main/java/ch/uzh/ifi/hase/soprafs22/entity/Game.java) consists of 8, 12 or 16 rounds and there can be two types of games which are Card Czar or Community mode. It also stores Round and Player specific information. Every [GameRound](src/main/java/ch/uzh/ifi/hase/soprafs22/entity/GameRound.java) has a black card and holds information like which cards are played during that round, who won the round or whether it is the final round or not. 
+
+The heart of the logic of the Game lies in the two components [GameService](src/main/java/ch/uzh/ifi/hase/soprafs22/service/GameService.java) and [GameRoundService](src/main/java/ch/uzh/ifi/hase/soprafs22/service/GameRoundService.java), which receive their tasks from the respective Controllers. This includes things like Game and Deck creation, joining and leaving a game, starting new rounds, playing and picking cards or transfering points / saving combinations to the User entity.
+
+The [Application](src/main/java/ch/uzh/ifi/hase/soprafs22/Application.java) is the main class of this app which runs everything.
 
 ## Launch & Development
 
